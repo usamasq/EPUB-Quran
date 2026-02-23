@@ -98,7 +98,7 @@ from quran_maps import SURAH_NAMES, JUZ_LOOKUP, SAJDAH_VERSES
 # =========================
 GLOBAL_CSS = """
 @font-face {
-    font-family: 'AlQalam-Quran-IndoPak';
+    font-family: 'AlQalamIndoPak';
     src: url('fonts/AlQalam-Quran-IndoPak.ttf');
     font-weight: normal;
     font-style: normal;
@@ -106,7 +106,7 @@ GLOBAL_CSS = """
 body {
     direction: rtl;
     unicode-bidi: embed;
-    font-family: 'AlQalam-Quran-IndoPak', serif;
+    font-family: 'AlQalamIndoPak', serif !important;
     font-weight: normal;
     font-style: normal;
     margin: 3% 5%;
@@ -114,6 +114,9 @@ body {
     background-color: #fff;
     text-rendering: optimizeLegibility;
     font-feature-settings: "liga" 1, "ccmp" 1;
+}
+.main-wrapper {
+    font-family: 'AlQalamIndoPak', serif !important;
 }
 h1 { text-align: center; color: #111; margin-top: 1.5em; margin-bottom: 1em; font-size: 2.2em; letter-spacing: 0.05em; }
 
@@ -155,7 +158,7 @@ h1 { text-align: center; color: #111; margin-top: 1.5em; margin-bottom: 1em; fon
 
 /* Title Page & Credits Page Styling */
 .title-page { text-align: center; margin-top: 30%; }
-.main-title { font-size: 3.5em; color: #111; margin-bottom: 0.2em; font-family: 'AlQalam-Quran-IndoPak', serif; }
+.main-title { font-size: 3.5em; color: #111; margin-bottom: 0.2em; font-family: 'AlQalamIndoPak', serif !important; }
 .sub-title { font-size: 1.2em; color: #555; font-family: sans-serif; margin-top: 0; direction: ltr; }
 .ornament { font-size: 2em; color: #888; margin: 20px 0; }
 
@@ -196,18 +199,18 @@ def load_data():
 def build_title_html():
     return f"""<html dir="rtl">
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Title Page</title></head>
-<body dir="rtl">
+<body dir="rtl"><div class="main-wrapper" dir="rtl">
     <div class="title-page">
         <div class="ornament">﴾ ❖ ﴿</div>
         <h1 class="main-title">{BOOK_TITLE}</h1>
         <div class="ornament">﴾ ❖ ﴿</div>
     </div>
-</body></html>"""
+</div></body></html>"""
 
 def build_credits_html():
     return f"""<html dir="ltr">
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Attribution & Credits</title></head>
-<body dir="ltr">
+<body dir="ltr"><div class="main-wrapper" dir="ltr">
     <div class="credits-page">
         <h2>Attribution & Credits</h2>
         <div class="credit-item">
@@ -238,7 +241,7 @@ def build_surah_html(surah_num, ayahs):
     
     html = f"""<html dir="rtl">
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>{name}</title></head>
-<body dir="rtl"><h1>{name}</h1>"""
+<body dir="rtl"><div class="main-wrapper" dir="rtl"><h1>{name}</h1>"""
     # Add visual separator before this surah (except the first one)
     if surah_num > 1:
         html += '<div class="surah-separator">✦ ✦ ✦</div>'
@@ -246,7 +249,7 @@ def build_surah_html(surah_num, ayahs):
     if surah_num not in [1, 9]:
         html += '<div class="bismillah" dir="rtl">بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ</div>'
 
-    html += '<div class="quran-text" dir="rtl">'
+    html += '<div class="quran-text" dir="rtl">' # Final Ayah numbers logic (as continuous text)
 
     for ayah_num in sorted(ayahs.keys()):
         # Collect indicators for this ayah
@@ -302,15 +305,14 @@ def build_surah_html(surah_num, ayahs):
         
         # Add ruku marker at the END of this ayah if it ends a ruku
         if (surah_num, ayah_num) in RUKU_ENDS:
-            surah_ruku = RUKU_ENDS[(surah_num, ayah_num)]
-            html += f' <span class="ruku-marker">ع{to_arabic_number(surah_ruku)}</span>'
+            html += f' <span class="ruku-marker">ع{to_arabic_number(RUKU_ENDS[(surah_num, ayah_num)])}</span>'
         
         if (surah_num, ayah_num) in SAJDAH_VERSES:
             html += '&nbsp;<span class="sajdah">۩</span>'
         
         html += ' </span>'
 
-    html += "</div></body></html>"
+    html += "</div></div></body></html>"
     html = html.replace('<div class="quran-text"></div>', '')
     return html
 
@@ -318,7 +320,7 @@ def build_surah_html(surah_num, ayahs):
 # JUZ (PARAH) INDEX
 # =========================
 def build_juz_index():
-    html = '<html dir="rtl"><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body dir="rtl">'
+    html = '<html dir="rtl"><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body dir="rtl"><div class="main-wrapper" dir="rtl">'
     html += '<h1>فهرس الأجزاء</h1>'
     html += '<div style="margin: 20px 5%; line-height: 2;">'
     
@@ -337,7 +339,7 @@ def build_juz_index():
 # SURAH INDEX
 # =========================
 def build_surah_index():
-    html = '<html dir="rtl"><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body dir="rtl">'
+    html = '<html dir="rtl"><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body dir="rtl"><div class="main-wrapper" dir="rtl">'
     html += '<h1>فهرس السور</h1>'
     html += '<div style="margin: 20px 5%; line-height: 2;">'
     
@@ -361,7 +363,8 @@ def create_epub(structured):
     book.add_author(BOOK_AUTHOR)
     
     book.add_metadata("DC", "publisher", BOOK_PUBLISHER)
-    book.add_metadata('AMAZON', 'specified-fonts', 'true')
+    # Corrected Kindle metadata hint
+    book.add_metadata(None, 'meta', '', {'name': 'specified-fonts', 'content': 'true'})
     book.add_metadata("DC", "subject", "Religion, Islam, Quran")
     book.add_metadata("DC", "description", "The Holy Quran featuring an authentic Indo-Pak script format. Built with complete Juz/Parah and Ruku navigation tailored specifically for modern e-readers and Kindle devices.")
     book.add_metadata("DC", "date", datetime.now(timezone.utc).isoformat())
@@ -369,7 +372,8 @@ def create_epub(structured):
     try:
         with open(FONT_PATH,"rb") as f:
             font_content = f.read()
-        font_item = epub.EpubItem(uid="font", file_name="fonts/AlQalam-Quran-IndoPak.ttf", media_type="font/ttf", content=font_content)
+        # Use application/x-font-ttf for better compatibility
+        font_item = epub.EpubItem(uid="font", file_name="fonts/AlQalam-Quran-IndoPak.ttf", media_type="application/x-font-ttf", content=font_content)
         book.add_item(font_item)
     except FileNotFoundError:
         print(f"Warning: Font {FONT_PATH} not found. EPUB will be built without embedded font.")
