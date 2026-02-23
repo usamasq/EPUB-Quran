@@ -216,7 +216,7 @@ def build_credits_html():
         </div>
         <div class="credit-item">
             <strong>Text Data (JSON)</strong>
-            The authentic Indo-Pak Quranic text used in this digital publication was beautifully digitized and sourced from the <a href="https://tarteel.qul.org.pk/">Tarteel QUL</a> website.
+            The authentic Indo-Pak Quranic text used in this digital publication was beautifully digitized and sourced from the <a href="https://qul.tarteel.ai/">Tarteel QUL</a> website.
         </div>
         <div class="credit-item">
             <strong>Typography</strong>
