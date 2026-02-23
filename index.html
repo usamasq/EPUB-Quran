@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPUB Quran - Traditional Indo-Pak Script Edition</title>
-    <meta name="description" content="A beautifully formatted digital edition of the Holy Quran in traditional Indo-Pak script, optimized for Kindle and E-ink e-readers.">
-    <meta name="keywords" content="Quran EPUB, Indo-Pak Quran, Kindle Quran, South Asian Quran, Nastaliq Quran, E-ink Quran">
+    <title>EPUB Quran v1.0 - Traditional Indo-Pak Script Edition</title>
+    <meta name="description"
+        content="A beautifully formatted digital edition of the Holy Quran in traditional Indo-Pak script, optimized for Kindle and E-ink e-readers.">
+    <meta name="keywords"
+        content="Quran EPUB, Indo-Pak Quran, Kindle Quran, South Asian Quran, Nastaliq Quran, E-ink Quran">
     <meta name="author" content="Usama Bin Shahid">
-    
+
     <!-- Open Graph / AIO -->
     <meta property="og:title" content="EPUB Quran - Indo-Pak Edition">
-    <meta property="og:description" content="Premium digital Quran optimized for e-readers. Authentic Indo-Pak script and professional typography.">
+    <meta property="og:description"
+        content="Premium digital Quran optimized for e-readers. Authentic Indo-Pak script and professional typography.">
     <meta property="og:type" content="website">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
-    
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+
     <style>
         :root {
             --bg: #0a0c0b;
@@ -66,6 +71,18 @@
             max-width: 800px;
         }
 
+        .version-badge {
+            display: inline-block;
+            background: var(--glass);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
         h1 {
             font-family: 'Outfit', sans-serif;
             font-size: 4rem;
@@ -85,17 +102,28 @@
             animation: fadeInUp 1.2s ease-out;
         }
 
+        .cta-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            animation: fadeIn 1.5s ease-in;
+        }
+
         .cta {
             display: inline-block;
-            padding: 1rem 2.5rem;
+            padding: 1rem 2rem;
             background: linear-gradient(135deg, var(--accent), #1b5e20);
             color: white;
             text-decoration: none;
             border-radius: 50px;
             font-weight: 600;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            animation: fadeIn 1.5s ease-in;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-secondary {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .cta:hover {
@@ -116,7 +144,7 @@
             background: var(--glass);
             padding: 2.5rem;
             border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             transition: border-color 0.3s ease;
         }
@@ -134,7 +162,7 @@
         .attribution {
             padding: 5rem 2rem;
             text-align: center;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .attribution p {
@@ -149,38 +177,73 @@
             text-align: center;
             font-size: 0.9rem;
             opacity: 0.5;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @media (max-width: 600px) {
-            h1 { font-size: 2.5rem; }
-            .subtitle { font-size: 1.1rem; }
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .cta-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="hero-pattern"></div>
-    
+
     <header>
         <div class="content">
+            <span class="version-badge">Version 1.0 Release</span>
             <h1>EPUB Quran</h1>
             <p class="subtitle">Traditional Indo-Pak script. <br>Optimized for Kindle & E-ink.</p>
-            <a href="https://github.com/usamabinshahid/holy-quran" class="cta">View on GitHub</a>
+            <div class="cta-container">
+                <a href="https://github.com/usamasq/EPUB-Quran/releases/tag/v1.0" class="cta">Download v1.0
+                    EPUB</a>
+                <a href="https://github.com/usamasq/EPUB-Quran" class="cta cta-secondary">View Source on
+                    GitHub</a>
+            </div>
         </div>
     </header>
 
@@ -201,11 +264,14 @@
 
     <div class="attribution">
         <p>A project by <strong>Usama Bin Shahid</strong></p>
-        <p>Source text from <strong>Tarteel QUL</strong>. Mappings by <strong>AlQuran.cloud</strong>. Typeset in <strong>AlQalam IndoPak</strong>.</p>
+        <p>Source text from <strong>Tarteel QUL</strong>. Mappings by <strong>AlQuran.cloud</strong>. Typeset in
+            <strong>AlQalam IndoPak</strong>.
+        </p>
     </div>
 
     <footer>
         &copy; 2026 EPUB Quran Project. Open Source under MIT License.
     </footer>
 </body>
+
 </html>

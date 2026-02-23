@@ -18,6 +18,7 @@ OUTPUT_EPUB = "Holy_Quran.epub"
 BOOK_TITLE = "القرآن الكريم"
 BOOK_LANGUAGE = "ar"
 BOOK_IDENTIFIER = "holy-quran"
+BOOK_VERSION = "1.0"
 BOOK_AUTHOR = "Usama Bin Shahid (Compiler), Tarteel QUL (Text)"
 BOOK_PUBLISHER = "Usama Bin Shahid"
 
