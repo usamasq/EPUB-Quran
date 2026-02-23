@@ -207,7 +207,7 @@ def build_credits_html():
         <h2>Attribution & Credits</h2>
         <div class="credit-item">
             <strong>Compilation & Formatting</strong>
-            This digital EPUB edition was meticulously compiled, formatted, and structured by <strong>{BOOK_PUBLISHER}</strong>.
+            This digital EPUB edition was meticulously compiled, formatted, and structured by <strong><a href="https://www.linkedin.com/in/usamasq/">{BOOK_PUBLISHER}</a></strong>.
         </div>
         <div class="credit-item">
             <strong>Text Data (JSON)</strong>

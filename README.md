@@ -21,7 +21,7 @@ You can download the pre-built EPUB directly from the **[Releases](https://githu
 
 ## 👤 Credits & Attribution
 
-This project was envisioned and developed by **Usama Bin Shahid**.
+This project was envisioned and developed by **[Usama Bin Shahid](https://www.linkedin.com/in/usamasq/)**.
 
 - **Source Text**: The authentic Indo-Pak Quranic text data was beautifully digitized and sourced from **[Tarteel QUL](https://tarteel.qul.org.pk/)**.
 - **Metadata Support**: Juz, Ruku, and Page boundary mappings were algorithmically derived using the **[AlQuran.cloud API](https://alquran.cloud/)**.
