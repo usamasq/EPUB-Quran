@@ -37,11 +37,21 @@ pip install EbookLib lxml Pillow
 ```
 
 ### Build the Quran
-Run the main publication script to generate your personal `Holy_Quran.epub`:
+Run the main publication script from the root directory to generate your personal EPUB:
 
 ```bash
-python quran_reader_pro.py
+python scripts/quran_reader_pro.py
 ```
+
+The output will be saved in the `releases/` directory.
+
+## 📂 Project Structure
+
+- **`scripts/`**: Contains the core publication engine and layout orchestrators.
+- **`data/`**: Comprehensive source text and structural mapping JSON databases.
+- **`assets/`**: High-resolution fonts and cover art.
+- **`releases/`**: Pre-built EPUB binaries and stable releases.
+- **`docs/`**: Source for the GitHub Pages landing page.
 
 ## 🗺️ Roadmap
 

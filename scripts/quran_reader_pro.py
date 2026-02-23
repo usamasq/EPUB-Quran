@@ -5,12 +5,15 @@ from datetime import datetime, timezone
 from ebooklib import epub
 import os
 
-INPUT_JSON = "indopak.json"
-RUKU_MAP_JSON = "ruku_starts.json"
-PAGE_MAP_JSON = "page_map.json"
-FONT_PATH = "fonts/IndoPakQuran.ttf"
-COVER_PATH = "cover.png"
-OUTPUT_EPUB = "Holy_Quran.epub"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+
+INPUT_JSON = os.path.join(PROJECT_ROOT, "data", "indopak.json")
+RUKU_MAP_JSON = os.path.join(PROJECT_ROOT, "data", "ruku_starts.json")
+PAGE_MAP_JSON = os.path.join(PROJECT_ROOT, "data", "page_map.json")
+FONT_PATH = os.path.join(PROJECT_ROOT, "assets", "fonts", "IndoPakQuran.ttf")
+COVER_PATH = os.path.join(PROJECT_ROOT, "assets", "cover.png")
+OUTPUT_EPUB = os.path.join(PROJECT_ROOT, "releases", "Holy_Quran.epub")
 
 # =========================
 # EPUB METADATA CONFIGURATION

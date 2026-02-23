@@ -1,15 +1,20 @@
 import json
+import os
 
 # =========================
 # LOAD JUZ STARTS DYNAMICALLY
 # =========================
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+JUZ_MAP_PATH = os.path.join(PROJECT_ROOT, "data", "juz_starts.json")
+
 try:
-    with open("juz_starts.json", "r", encoding="utf-8") as f:
+    with open(JUZ_MAP_PATH, "r", encoding="utf-8") as f:
         juz_starts_raw = json.load(f)
     # Convert string keys back to int, and lists to tuples
     JUZ_LOOKUP = {tuple(v): int(k) for k, v in juz_starts_raw.items()}
 except FileNotFoundError:
-    print("Warning: juz_starts.json not found. Generating without Juz markers.")
+    print(f"Warning: {JUZ_MAP_PATH} not found. Generating without Juz markers.")
     JUZ_LOOKUP = {}
 
 # =========================
