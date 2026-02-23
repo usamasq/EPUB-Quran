@@ -9,7 +9,7 @@ A beautifully formatted digital edition of the **Holy Quran** in the traditional
 
 You can download the pre-built EPUB directly from the **[Releases](https://github.com/usamasq/EPUB-Quran/releases)** section of this repository.
 
-- **[Download Holy_Quran.epub (v1.0)](https://github.com/usamasq/EPUB-Quran/releases/tag/v1.0)**
+- **[Download Holy_Quran.epub (v1.0)](https://github.com/usamasq/EPUB-Quran/releases/download/v1.0/Holy_Quran.epub)**
 
 ## 🌟 Key Features
 
