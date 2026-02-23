@@ -139,6 +139,7 @@ h1 { text-align: center; color: #111; margin-top: 1.5em; margin-bottom: 1em; fon
 }
 .ayah { 
     display: inline; /* Forces continuous reading flow instead of list format */
+    unicode-bidi: isolate;
 }
 .surah-separator {
     text-align: center;
@@ -260,7 +261,7 @@ def build_surah_html(surah_num, ayahs):
         # If we have indicators or this is the start of the surah (except first ayah of surah_1), 
         # ensure we close previous quran-text block and open a new one.
         if indicators_html:
-            html += f'</div>{indicators_html}<div class="quran-text">'
+            html += f'</div>{indicators_html}<div class="quran-text" dir="rtl">'
 
         # 1. Join the raw words
         text = " ".join(ayahs[ayah_num])
@@ -284,11 +285,18 @@ def build_surah_html(surah_num, ayahs):
         # 3. Add the proper sequence back: \u06DD (End of Ayah Symbol) + The exact Ayah Number.
         # Use Arabic digits (to_arabic_number) as many Indo-Pak fonts are specifically 
         # tuned for Arabic digits when forming the enclosed-circle ligature.
-        # Wrap in a span to prevent breaking and force tight rendering.
-        ayah_mark = f"\u06DD{to_arabic_number(ayah_num)}"
-        text = f'{text} <span class="ayah-end">{ayah_mark}</span>'
+        # Prepare ayah text with RLM (Right-to-Left Mark) for stronger directionality hints
+        # \u200f is the Unicode RLM marker
+        ayah_text_content = f"\u200f{text}" # Apply RLM to the cleaned text
         
-        html += f'<span class="ayah" id="a{surah_num}_{ayah_num}">{text}'
+        # The ayah_mark is the symbol + number
+        ayah_mark = f"\u06DD{to_arabic_number(ayah_num)}"
+
+        # We add dir="rtl" to every span for granular control (Lithium/Android readers)
+        html += f'<span class="ayah" id="a{surah_num}_{ayah_num}" dir="rtl">{ayah_text_content}'
+        
+        # Add the Ayah end marker
+        html += f' <span class="ayah-end">{ayah_mark}</span>'
         
         # Add ruku marker at the END of this ayah if it ends a ruku
         if (surah_num, ayah_num) in RUKU_ENDS:
