@@ -105,6 +105,7 @@ GLOBAL_CSS = """
 }
 body {
     direction: rtl;
+    unicode-bidi: embed;
     font-family: 'AlQalam-Quran-IndoPak', serif;
     margin: 3% 5%;
     color: #000;
@@ -134,6 +135,7 @@ h1 { text-align: center; color: #111; margin-top: 1.5em; margin-bottom: 1em; fon
     font-size: 1.6em;
     word-spacing: 0; /* Resetting to prevent breaking ligatures */
     letter-spacing: 0; /* Resetting to prevent breaking ligatures */
+    unicode-bidi: embed;
 }
 .ayah { 
     display: inline; /* Forces continuous reading flow instead of list format */
@@ -191,7 +193,7 @@ def load_data():
 def build_title_html():
     return f"""<html dir="rtl">
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Title Page</title></head>
-<body>
+<body dir="rtl">
     <div class="title-page">
         <div class="ornament">﴾ ❖ ﴿</div>
         <h1 class="main-title">{BOOK_TITLE}</h1>
@@ -202,7 +204,7 @@ def build_title_html():
 def build_credits_html():
     return f"""<html dir="ltr">
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Attribution & Credits</title></head>
-<body>
+<body dir="ltr">
     <div class="credits-page">
         <h2>Attribution & Credits</h2>
         <div class="credit-item">
@@ -233,15 +235,15 @@ def build_surah_html(surah_num, ayahs):
     
     html = f"""<html dir="rtl">
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>{name}</title></head>
-<body><h1>{name}</h1>"""
+<body dir="rtl"><h1>{name}</h1>"""
     # Add visual separator before this surah (except the first one)
     if surah_num > 1:
         html += '<div class="surah-separator">✦ ✦ ✦</div>'
     
     if surah_num not in [1, 9]:
-        html += '<div class="bismillah">بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ</div>'
+        html += '<div class="bismillah" dir="rtl">بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ</div>'
 
-    html += '<div class="quran-text">'
+    html += '<div class="quran-text" dir="rtl">'
 
     for ayah_num in sorted(ayahs.keys()):
         # Collect indicators for this ayah
@@ -306,7 +308,7 @@ def build_surah_html(surah_num, ayahs):
 # JUZ (PARAH) INDEX
 # =========================
 def build_juz_index():
-    html = '<html dir="rtl"><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body>'
+    html = '<html dir="rtl"><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body dir="rtl">'
     html += '<h1>فهرس الأجزاء</h1>'
     html += '<div style="margin: 20px 5%; line-height: 2;">'
     
@@ -325,7 +327,7 @@ def build_juz_index():
 # SURAH INDEX
 # =========================
 def build_surah_index():
-    html = '<html dir="rtl"><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body>'
+    html = '<html dir="rtl"><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body dir="rtl">'
     html += '<h1>فهرس السور</h1>'
     html += '<div style="margin: 20px 5%; line-height: 2;">'
     
