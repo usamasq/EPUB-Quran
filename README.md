@@ -1,9 +1,9 @@
-# EPUB Quran - Traditional Indo-Pak Script Edition
+# EPUB Quran
 
 [![Version](https://img.shields.io/badge/Version-1.0-green.svg)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A beautifully formatted digital edition of the **Holy Quran** in the traditional **Indo-Pak (South Asian)** script, specifically optimized for **Kindle** and other E-ink e-readers. This project focuses on high-quality typography, professional layout, and robust rendering for authentic Quranic reading.
+A beautifully formatted digital edition of the **Holy Quran**, specifically optimized for **Kindle** and other E-ink e-readers. This project focuses on high-quality typography, professional layout, and robust rendering for authentic Quranic reading.
 
 ## 📥 Download v1.0
 
@@ -13,7 +13,6 @@ You can download the pre-built EPUB directly from the **[Releases](https://githu
 
 ## 🌟 Key Features
 
-- **Authentic Indo-Pak Script**: Powered by high-resolution Nastaliq-style fonts for a traditional South Asian reading experience.
 - **Kindle & E-ink Optimized**: Custom CSS and character encoding fixes resolve common e-reader issues like overlapping Ayah markers and clipped Waqf (pause) signs.
 - **Mushaf-Style Flow**: Continuous, justified text blocks that replicate the feel of a physical Mushaf while maintaining digital responsiveness.
 - **Precise Metadata**: Accurate Juz (Parah) boundaries and Ruku markers, all beautifully formatted.
@@ -25,7 +24,6 @@ This project was envisioned and developed by **[Usama Bin Shahid](https://www.li
 
 - **Source Text**: The authentic Indo-Pak Quranic text data was beautifully digitized and sourced from **[Tarteel QUL](https://qul.tarteel.ai/)**.
 - **Metadata Support**: Juz, Ruku, and Page boundary mappings were algorithmically derived using the **[AlQuran.cloud API](https://alquran.cloud/)**.
-- **Typography**: The project utilizes the elegant **AlQalam Quran IndoPak** font to ensure an authentic South Asian aesthetic.
 
 ## 🚀 How to Use
 
@@ -68,4 +66,4 @@ We are committed to continuously improving this project for the Ummah. Planned f
 This project is released under the **MIT License**. It is open-source and intended for the benefit of the global Muslim community.
 
 ---
-*Developed with ❤️ for the benefit of the Ummah.*
+*Developed with ❤️*
