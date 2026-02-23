@@ -1,0 +1,4 @@
+EbookLib==0.18
+lxml==5.3.0
+six==1.17.0
+Pillow==11.1.0

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPUB Quran - Traditional Indo-Pak Script Edition</title>
+    <meta name="description" content="A beautifully formatted digital edition of the Holy Quran in traditional Indo-Pak script, optimized for Kindle and E-ink e-readers.">
+    <meta name="keywords" content="Quran EPUB, Indo-Pak Quran, Kindle Quran, South Asian Quran, Nastaliq Quran, E-ink Quran">
+    <meta name="author" content="Usama Bin Shahid">
+    
+    <!-- Open Graph / AIO -->
+    <meta property="og:title" content="EPUB Quran - Indo-Pak Edition">
+    <meta property="og:description" content="Premium digital Quran optimized for e-readers. Authentic Indo-Pak script and professional typography.">
+    <meta property="og:type" content="website">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #0a0c0b;
+            --text: #e0e0e0;
+            --accent: #2e7d32;
+            --gold: #d4af37;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            background: radial-gradient(circle at center, #1a2e23 0%, #0a0c0b 100%);
+        }
+
+        .hero-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%23d4af37' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--gold);
+            letter-spacing: -1px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 2.5rem;
+            color: var(--text);
+            opacity: 0.8;
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        .cta {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--accent), #1b5e20);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            animation: fadeIn 1.5s ease-in;
+        }
+
+        .cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(46, 125, 50, 0.4);
+        }
+
+        .features {
+            padding: 5rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--glass);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--gold);
+        }
+
+        .feature-card h3 {
+            color: var(--gold);
+            margin-bottom: 1rem;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .attribution {
+            padding: 5rem 2rem;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .attribution p {
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+
+        footer {
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.5;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            .subtitle { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-pattern"></div>
+    
+    <header>
+        <div class="content">
+            <h1>EPUB Quran</h1>
+            <p class="subtitle">Traditional Indo-Pak script. <br>Optimized for Kindle & E-ink.</p>
+            <a href="https://github.com/usamabinshahid/holy-quran" class="cta">View on GitHub</a>
+        </div>
+    </header>
+
+    <div class="features">
+        <div class="feature-card">
+            <h3>Authentic Script</h3>
+            <p>High-quality Nastaliq typography specifically optimized for digital screens.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Kindle Ready</h3>
+            <p>Custom fixes for Ayah markers and Waqf signs to ensure perfect rendering on e-readers.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Metadata Mapped</h3>
+            <p>Precisely mapped Juz and Ruku boundaries for easy navigation.</p>
+        </div>
+    </div>
+
+    <div class="attribution">
+        <p>A project by <strong>Usama Bin Shahid</strong></p>
+        <p>Source text from <strong>Tarteel QUL</strong>. Mappings by <strong>AlQuran.cloud</strong>. Typeset in <strong>AlQalam IndoPak</strong>.</p>
+    </div>
+
+    <footer>
+        &copy; 2026 EPUB Quran Project. Open Source under MIT License.
+    </footer>
+</body>
+</html>
