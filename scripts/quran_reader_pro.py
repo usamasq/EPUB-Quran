@@ -11,7 +11,7 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 INPUT_JSON = os.path.join(PROJECT_ROOT, "data", "indopak.json")
 RUKU_MAP_JSON = os.path.join(PROJECT_ROOT, "data", "ruku_starts.json")
 PAGE_MAP_JSON = os.path.join(PROJECT_ROOT, "data", "page_map.json")
-FONT_PATH = os.path.join(PROJECT_ROOT, "assets", "fonts", "IndoPakQuran.ttf")
+FONT_PATH = os.path.join(PROJECT_ROOT, "assets", "fonts", "AlQalam-Quran-IndoPak.ttf")
 COVER_PATH = os.path.join(PROJECT_ROOT, "assets", "cover.png")
 OUTPUT_EPUB = os.path.join(PROJECT_ROOT, "releases", "Holy_Quran.epub")
 
@@ -98,14 +98,14 @@ from quran_maps import SURAH_NAMES, JUZ_LOOKUP, SAJDAH_VERSES
 # =========================
 GLOBAL_CSS = """
 @font-face {
-    font-family: 'IndoPak';
-    src: url('fonts/IndoPakQuran.ttf');
+    font-family: 'AlQalam-Quran-IndoPak';
+    src: url('fonts/AlQalam-Quran-IndoPak.ttf');
     font-weight: normal;
     font-style: normal;
 }
 body {
     direction: rtl;
-    font-family: 'IndoPak', serif;
+    font-family: 'AlQalam-Quran-IndoPak', serif;
     margin: 3% 5%;
     color: #000;
     background-color: #fff;
@@ -150,7 +150,7 @@ h1 { text-align: center; color: #111; margin-top: 1.5em; margin-bottom: 1em; fon
 
 /* Title Page & Credits Page Styling */
 .title-page { text-align: center; margin-top: 30%; }
-.main-title { font-size: 3.5em; color: #111; margin-bottom: 0.2em; font-family: 'IndoPak', serif; }
+.main-title { font-size: 3.5em; color: #111; margin-bottom: 0.2em; font-family: 'AlQalam-Quran-IndoPak', serif; }
 .sub-title { font-size: 1.2em; color: #555; font-family: sans-serif; margin-top: 0; direction: ltr; }
 .ornament { font-size: 2em; color: #888; margin: 20px 0; }
 
@@ -211,7 +211,7 @@ def build_credits_html():
         </div>
         <div class="credit-item">
             <strong>Text Data (JSON)</strong>
-            The authentic Indo-Pak Quranic text used in this digital publication was beautifully digitized and sourced from the <em>Tarteel QUL Website</em>.
+            The authentic Indo-Pak Quranic text used in this digital publication was beautifully digitized and sourced from the <a href="https://tarteel.qul.org.pk/">Tarteel QUL</a> website.
         </div>
         <div class="credit-item">
             <strong>Typography</strong>
@@ -219,7 +219,7 @@ def build_credits_html():
         </div>
         <div class="credit-item">
             <strong>Metadata Mapping</strong>
-            Juz and Ruku boundary mappings were algorithmically mapped using the <em>AlQuran.cloud API</em>.
+            Juz and Ruku boundary mappings were algorithmically mapped using the <a href="https://alquran.cloud/">AlQuran.cloud API</a>.
         </div>
     </div>
 </body></html>"""
@@ -356,7 +356,7 @@ def create_epub(structured):
     try:
         with open(FONT_PATH,"rb") as f:
             font_content = f.read()
-        font_item = epub.EpubItem(uid="font", file_name="fonts/IndoPakQuran.ttf", media_type="font/ttf", content=font_content)
+        font_item = epub.EpubItem(uid="font", file_name="fonts/AlQalam-Quran-IndoPak.ttf", media_type="font/ttf", content=font_content)
         book.add_item(font_item)
     except FileNotFoundError:
         print(f"Warning: Font {FONT_PATH} not found. EPUB will be built without embedded font.")

@@ -23,8 +23,8 @@ You can download the pre-built EPUB directly from the **[Releases](https://githu
 
 This project was envisioned and developed by **Usama Bin Shahid**.
 
-- **Source Text**: The authentic Indo-Pak Quranic text data was beautifully digitized and sourced from **Tarteel QUL**.
-- **Metadata Support**: Juz, Ruku, and Page boundary mappings were algorithmically derived using the **AlQuran.cloud API**.
+- **Source Text**: The authentic Indo-Pak Quranic text data was beautifully digitized and sourced from **[Tarteel QUL](https://tarteel.qul.org.pk/)**.
+- **Metadata Support**: Juz, Ruku, and Page boundary mappings were algorithmically derived using the **[AlQuran.cloud API](https://alquran.cloud/)**.
 - **Typography**: The project utilizes the elegant **AlQalam Quran IndoPak** font to ensure an authentic South Asian aesthetic.
 
 ## 🚀 How to Use
