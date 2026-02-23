@@ -22,8 +22,9 @@ wheels/
 *.egg
 
 # EPUB Project Specific
-releases/*.epub
-data/*.json
+# Allow releases and data for public repo
+!releases/*.epub
+!data/*.json
 scripts/__pycache__/
 all_chars_output.txt
 verification_output.txt
