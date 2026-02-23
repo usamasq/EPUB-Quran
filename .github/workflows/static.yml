@@ -22,11 +22,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying; no building
+  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps:deployment:outputs:page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -36,7 +36,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload the docs directory
+          # Upload the docs directory content to the root of the site
           path: './docs'
       - name: Deploy to GitHub Pages
         id: deployment
