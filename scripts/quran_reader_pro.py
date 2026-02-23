@@ -107,6 +107,8 @@ body {
     direction: rtl;
     unicode-bidi: embed;
     font-family: 'AlQalam-Quran-IndoPak', serif;
+    font-weight: normal;
+    font-style: normal;
     margin: 3% 5%;
     color: #000;
     background-color: #fff;
@@ -359,6 +361,7 @@ def create_epub(structured):
     book.add_author(BOOK_AUTHOR)
     
     book.add_metadata("DC", "publisher", BOOK_PUBLISHER)
+    book.add_metadata('AMAZON', 'specified-fonts', 'true')
     book.add_metadata("DC", "subject", "Religion, Islam, Quran")
     book.add_metadata("DC", "description", "The Holy Quran featuring an authentic Indo-Pak script format. Built with complete Juz/Parah and Ruku navigation tailored specifically for modern e-readers and Kindle devices.")
     book.add_metadata("DC", "date", datetime.now(timezone.utc).isoformat())
