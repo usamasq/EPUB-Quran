@@ -5,7 +5,10 @@
       "Bash(python -c:*)",
       "Bash(python scripts/quran_reader_pro.py:*)",
       "Bash(python scripts/check_epub_regressions.py:*)",
-      "Bash(python scripts/lint_quran_source.py:*)"
+      "Bash(python scripts/lint_quran_source.py:*)",
+      "Bash(gh release list:*)",
+      "Bash(git tag:*)",
+      "Bash(git push:*)"
     ]
   }
 }
