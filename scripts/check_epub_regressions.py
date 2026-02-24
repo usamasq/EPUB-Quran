@@ -122,7 +122,7 @@ def run_checks(epub_path, expected_ayahs, expected_ruku_visible):
         raise AssertionError(f"{epub_path}: sajdah marker count mismatch. expected=15 actual={counts['sajdah']}")
     if counts["unstyled_sajdah"] != 0:
         raise AssertionError(f"{epub_path}: unstyled sajdah symbols remain in output")
-    if "application/vnd.ms-opentype" not in opf:
+    if "application/x-font-truetype" not in opf:
         raise AssertionError(f"{epub_path}: embedded font media type missing/incorrect")
     if 'page-progression-direction="rtl"' not in opf:
         raise AssertionError(f"{epub_path}: spine direction metadata missing")

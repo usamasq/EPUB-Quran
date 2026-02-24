@@ -146,6 +146,7 @@ def collect_font_charset(structured):
     chars.update("بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ")
     chars.update("الجزءع")
     chars.update("۩۞")
+    chars.update(ARABIC_END_MARK)
     chars.update("٠١٢٣٤٥٦٧٨٩")
 
     for name in SURAH_NAMES.values():
@@ -321,10 +322,7 @@ def build_css(target):
     return f"""
 @font-face {{
     font-family: 'AlQalamIndoPak';
-    src: local('AlQalam Quran IndoPak'),
-         local('AlQalam-Quran-IndoPak'),
-         url('fonts/AlQalam-Quran-IndoPak.ttf') format('truetype');
-    font-display: swap;
+    src: url('fonts/AlQalam-Quran-IndoPak.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }}
@@ -352,7 +350,6 @@ h1 {{
     color: {accent};
     margin: 1.2em 0 0.9em;
     font-size: 2.12em;
-    letter-spacing: 0.02em;
 }}
 
 .bismillah {{
@@ -417,11 +414,9 @@ h1 {{
 
 .quran-text {{
     text-align: right;
-    text-justify: auto;
     line-height: {quran_line_height};
     font-size: {quran_font_size};
-    word-spacing: 0;
-    letter-spacing: normal;
+    word-spacing: 0em;
     word-break: keep-all;
     overflow-wrap: normal;
 {advanced_typography}
@@ -695,7 +690,7 @@ def build_surah_section_html(surah_num, ayahs, section, target, ruku_ends, singl
         ayah_mark = f"{ARABIC_END_MARK}{to_arabic_number(ayah_num)}"
 
         if (surah_num, ayah_num) in JUZ_LOOKUP:
-            html += f'<span class="ayah-anchor" id="a{surah_num}_{ayah_num}"></span>'
+            html += f'<span class="ayah-anchor" id="a{surah_num}_{ayah_num}">\u200b</span>'
 
         html += text
         html += f' <span class="ayah-end">{ayah_mark}</span>'
@@ -786,7 +781,7 @@ def create_epub(structured, target, font_content):
         font_item = epub.EpubItem(
             uid="font",
             file_name="fonts/AlQalam-Quran-IndoPak.ttf",
-            media_type="application/vnd.ms-opentype",
+            media_type="application/x-font-truetype",
             content=font_content,
         )
         book.add_item(font_item)
