@@ -14,7 +14,7 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 
 INPUT_JSON = os.path.join(PROJECT_ROOT, "data", "indopak.json")
 RUKU_MAP_JSON = os.path.join(PROJECT_ROOT, "data", "ruku_starts.json")
-FONT_PATH = os.path.join(PROJECT_ROOT, "assets", "fonts", "AlQalam-Quran-IndoPak.ttf")
+FONT_PATH = os.path.join(PROJECT_ROOT, "assets", "fonts", "ScheherazadeNew-Regular.ttf")
 COVER_PATH = os.path.join(PROJECT_ROOT, "assets", "cover.png")
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, "releases")
 PROJECT_REPO_URL = "https://github.com/usamasq/EPUB-Quran"
@@ -321,8 +321,8 @@ def build_css(target):
 
     return f"""
 @font-face {{
-    font-family: 'AlQalamIndoPak';
-    src: url('fonts/AlQalam-Quran-IndoPak.ttf') format('truetype');
+    font-family: 'ScheherazadeNew';
+    src: url('fonts/ScheherazadeNew-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }}
@@ -333,7 +333,7 @@ html, body {{
 }}
 
 body {{
-    font-family: 'AlQalamIndoPak', 'Amiri', 'Scheherazade New', serif;
+    font-family: 'ScheherazadeNew', 'Amiri Quran', 'Noto Naskh Arabic', serif;
     margin: {body_margin};
     color: {body_text};
     background-color: {bg_color};
@@ -634,8 +634,8 @@ def build_credits_html(target):
             </div>
             <div class="credit-card">
                 <h3>Typeface</h3>
-                Arabic text is rendered using the embedded AlQalam Quran IndoPak font for
-                consistent script behavior on constrained e-reader engines.
+                Arabic text is rendered using the embedded Scheherazade New font (SIL OFL)
+                for accurate diacritical mark positioning on e-reader engines.
             </div>
         </div>
         <div class="build-meta">
@@ -780,7 +780,7 @@ def create_epub(structured, target, font_content):
             raise FileNotFoundError(FONT_PATH)
         font_item = epub.EpubItem(
             uid="font",
-            file_name="fonts/AlQalam-Quran-IndoPak.ttf",
+            file_name="fonts/ScheherazadeNew-Regular.ttf",
             media_type="application/x-font-truetype",
             content=font_content,
         )

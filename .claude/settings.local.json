@@ -8,7 +8,12 @@
       "Bash(python scripts/lint_quran_source.py:*)",
       "Bash(gh release list:*)",
       "Bash(git tag:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:software.sil.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:tanzil.net)",
+      "WebFetch(domain:www.mobileread.com)",
+      "Bash(curl:*)"
     ]
   }
 }
