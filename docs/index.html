@@ -196,6 +196,65 @@
       max-width: 760px;
     }
 
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .hero-main {
+      min-width: 0;
+    }
+
+    .hero-kpis {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .kpi {
+      border: 1px solid var(--line);
+      background: #151515;
+      border-radius: 999px;
+      padding: 6px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.8rem;
+      color: #c9c9c9;
+    }
+
+    .kpi strong {
+      color: #ffffff;
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .hero-side {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #121212;
+      padding: 12px;
+    }
+
+    .hero-side h3 {
+      font-size: 1rem;
+      margin-bottom: 5px;
+      color: #f4f4f4;
+    }
+
+    .sub-tight {
+      margin-bottom: 8px;
+      font-size: 0.86rem;
+    }
+
+    .mini-links {
+      display: grid;
+      gap: 7px;
+    }
+
     .cta-row {
       display: flex;
       flex-wrap: wrap;
@@ -250,10 +309,66 @@
       margin-bottom: 10px;
     }
 
-    .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    .profile-group {
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .profile-btn {
+      border: 1px solid var(--line);
+      background: #131313;
+      color: #d1d1d1;
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .profile-btn:hover {
+      border-color: #535353;
+      color: #efefef;
+    }
+
+    .profile-btn.active {
+      background: #f3f3f3;
+      color: #0c0c0c;
+      border-color: #f3f3f3;
+      font-weight: 600;
+    }
+
+    .recommend-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #151515;
+      padding: 12px;
+    }
+
+    .recommend-head {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .recommend-head h3 {
+      font-size: 1.05rem;
+      margin-bottom: 5px;
+    }
+
+    .recommend-label {
+      color: #b6f0c8;
+      font-size: 0.78rem;
+      margin-bottom: 4px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .recommend-link {
+      min-width: 150px;
     }
 
     .quick-link,
@@ -290,6 +405,34 @@
       gap: 9px;
     }
 
+    .variant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+    }
+
+    .variant-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-2);
+      padding: 11px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .variant-card h3 {
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .variant-card p {
+      font-size: 0.86rem;
+      color: #c6c6c6;
+      margin: 0;
+      min-height: 54px;
+    }
+
     .release-card {
       border: 1px solid var(--line);
       border-radius: 12px;
@@ -321,43 +464,6 @@
     .asset-list {
       display: grid;
       gap: 7px;
-    }
-
-    .matrix {
-      width: 100%;
-      border-collapse: collapse;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      overflow: hidden;
-      font-size: 0.88rem;
-    }
-
-    .matrix th,
-    .matrix td {
-      border-bottom: 1px solid var(--line-soft);
-      border-right: 1px solid var(--line-soft);
-      padding: 9px 10px;
-      text-align: start;
-      vertical-align: top;
-    }
-
-    .matrix th {
-      background: #141414;
-      color: #f0f0f0;
-      font-weight: 600;
-    }
-
-    .matrix td {
-      color: #d7d7d7;
-    }
-
-    .matrix tr:last-child td {
-      border-bottom: 0;
-    }
-
-    .matrix th:last-child,
-    .matrix td:last-child {
-      border-right: 0;
     }
 
     .credit-box {
@@ -392,8 +498,9 @@
       text-align: right;
     }
 
-    [data-lang="ar"] .matrix th,
-    [data-lang="ar"] .matrix td {
+    [data-lang="ar"] .hero-side h3,
+    [data-lang="ar"] .variant-card,
+    [data-lang="ar"] .recommend-card {
       text-align: right;
     }
 
@@ -410,6 +517,10 @@
         padding: 22px 14px 16px;
       }
 
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
       .panel {
         padding: 13px 11px;
       }
@@ -421,6 +532,15 @@
       .cta-row {
         display: grid;
         grid-template-columns: 1fr;
+      }
+
+      .recommend-head {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .recommend-link {
+        width: 100%;
       }
     }
   </style>
@@ -436,40 +556,98 @@
     </div>
 
     <section class="hero">
-      <div class="arabic-calligraphy" data-i18n="calligraphy">القرآن الكريم</div>
-      <h1 data-i18n="heroTitle">Download Quran EPUB Editions</h1>
-      <p class="hero-sub" data-i18n="heroSub">
-        Clean multi-edition downloads for Kindle and Android EPUB readers, with full and compatibility variants.
-      </p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="https://github.com/usamasq/EPUB-Quran/releases" target="_blank" rel="noopener" data-i18n="openReleases">Open Releases</a>
-        <a class="btn" href="https://github.com/usamasq/EPUB-Quran" target="_blank" rel="noopener" data-i18n="viewRepo">View Repository</a>
+      <div class="hero-grid">
+        <div class="hero-main">
+          <div class="arabic-calligraphy" data-i18n="calligraphy">القرآن الكريم</div>
+          <h1 data-i18n="heroTitle">Download Quran EPUB Editions</h1>
+          <p class="hero-sub" data-i18n="heroSub">
+            Clean multi-edition downloads for Kindle and Android EPUB readers, with full and compatibility variants.
+          </p>
+          <div class="hero-kpis">
+            <div class="kpi"><strong>4</strong><span data-i18n="kpiVariants">Variants</span></div>
+            <div class="kpi"><strong>RTL</strong><span data-i18n="kpiReady">Ready</span></div>
+            <div class="kpi"><strong>Kindle + Android</strong><span data-i18n="kpiSupport">Support</span></div>
+          </div>
+          <div class="cta-row">
+            <a id="heroRecommendedLink" class="btn btn-primary" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub" target="_blank" rel="noopener" data-i18n="heroRecommended">Download Recommended</a>
+            <a class="btn" href="https://github.com/usamasq/EPUB-Quran/releases" target="_blank" rel="noopener" data-i18n="openReleases">Open Releases</a>
+            <a class="btn" href="https://github.com/usamasq/EPUB-Quran" target="_blank" rel="noopener" data-i18n="viewRepo">View Repository</a>
+          </div>
+        </div>
+        <aside class="hero-side">
+          <h3 data-i18n="heroSideTitle">Variant Snapshot</h3>
+          <p class="sub sub-tight" data-i18n="heroSideSub">All variants contain the same Quran text, with different rendering profiles.</p>
+          <div class="mini-links">
+            <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub" target="_blank" rel="noopener">
+              <span>Holy_Quran_full.epub</span><span data-i18n="download">Download</span>
+            </a>
+            <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full_compat.epub" target="_blank" rel="noopener">
+              <span>Holy_Quran_full_compat.epub</span><span data-i18n="download">Download</span>
+            </a>
+            <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite.epub" target="_blank" rel="noopener">
+              <span>Holy_Quran_lite.epub</span><span data-i18n="download">Download</span>
+            </a>
+            <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite_compat.epub" target="_blank" rel="noopener">
+              <span>Holy_Quran_lite_compat.epub</span><span data-i18n="download">Download</span>
+            </a>
+          </div>
+        </aside>
       </div>
     </section>
 
     <section class="panel">
-      <h2 data-i18n="quickTitle">Quick Downloads (Latest Release)</h2>
-      <p class="sub" data-i18n="quickSub">
-        One-click links for the latest published release.
-      </p>
-      <div class="quick-grid">
-        <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub" target="_blank" rel="noopener">
-          <span>Holy_Quran_full.epub</span><span data-i18n="download">Download</span>
-        </a>
-        <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full_compat.epub" target="_blank" rel="noopener">
-          <span>Holy_Quran_full_compat.epub</span><span data-i18n="download">Download</span>
-        </a>
-        <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite.epub" target="_blank" rel="noopener">
-          <span>Holy_Quran_lite.epub</span><span data-i18n="download">Download</span>
-        </a>
-        <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite_compat.epub" target="_blank" rel="noopener">
-          <span>Holy_Quran_lite_compat.epub</span><span data-i18n="download">Download</span>
-        </a>
-        <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/SHA256SUMS.txt" target="_blank" rel="noopener">
-          <span>SHA256SUMS.txt</span><span data-i18n="checksums">Checksums</span>
-        </a>
+      <h2 data-i18n="smartTitle">Smart Download Assistant</h2>
+      <p class="sub" data-i18n="smartSub">Select your reader profile and get one recommended file instantly.</p>
+      <div class="profile-group" id="profileGroup">
+        <button class="profile-btn active" type="button" data-profile="kindle_modern" data-i18n="profileKindleModern">Kindle (Modern)</button>
+        <button class="profile-btn" type="button" data-profile="kindle_old" data-i18n="profileKindleOld">Kindle (Older)</button>
+        <button class="profile-btn" type="button" data-profile="android" data-i18n="profileAndroid">Android EPUB Readers</button>
+        <button class="profile-btn" type="button" data-profile="strict" data-i18n="profileStrict">Strict Compatibility</button>
       </div>
-      <p class="status" data-i18n="quickNote">Need a specific version? Use the release list below.</p>
+      <div class="recommend-card">
+        <div class="recommend-head">
+          <div>
+            <div class="recommend-label" data-i18n="recommendedForYou">Recommended for you</div>
+            <h3 id="recommendedFile">Holy_Quran_full.epub</h3>
+            <p id="recommendedReason" class="sub sub-tight">Best balance for modern Kindle firmware and stable EPUB engines.</p>
+          </div>
+          <a id="recommendedLink" class="btn btn-primary recommend-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub" target="_blank" rel="noopener">
+            <span data-i18n="downloadNow">Download Now</span>
+          </a>
+        </div>
+        <p id="recommendedSummary" class="status">Enhanced typography with no surah chunking.</p>
+      </div>
+      <p class="status" data-i18n="quickNote">Need a specific tag? Use the release list below.</p>
+    </section>
+
+    <section class="panel">
+      <h2 data-i18n="variantsTitle">Variants At A Glance</h2>
+      <p class="sub" data-i18n="variantsSub">Same Quran content, different rendering behavior for different devices.</p>
+      <div class="variant-grid">
+        <article class="variant-card">
+          <h3>Holy_Quran_full.epub</h3>
+          <p data-i18n="variantFullSummary">Enhanced typography with no surah chunking. Best default for modern Kindle.</p>
+          <a class="asset-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub" target="_blank" rel="noopener"><span data-i18n="download">Download</span><span class="asset-size">.epub</span></a>
+        </article>
+        <article class="variant-card">
+          <h3>Holy_Quran_full_compat.epub</h3>
+          <p data-i18n="variantFullCompatSummary">Compatibility CSS and split long surahs for older EPUB engines.</p>
+          <a class="asset-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full_compat.epub" target="_blank" rel="noopener"><span data-i18n="download">Download</span><span class="asset-size">.epub</span></a>
+        </article>
+        <article class="variant-card">
+          <h3>Holy_Quran_lite.epub</h3>
+          <p data-i18n="variantLiteSummary">Lighter rendering profile with chunking for smoother flow on low-memory devices.</p>
+          <a class="asset-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite.epub" target="_blank" rel="noopener"><span data-i18n="download">Download</span><span class="asset-size">.epub</span></a>
+        </article>
+        <article class="variant-card">
+          <h3>Holy_Quran_lite_compat.epub</h3>
+          <p data-i18n="variantLiteCompatSummary">Most conservative compatibility profile for strict or unstable readers.</p>
+          <a class="asset-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite_compat.epub" target="_blank" rel="noopener"><span data-i18n="download">Download</span><span class="asset-size">.epub</span></a>
+        </article>
+      </div>
+      <div class="credit-box" data-i18n="creditBox">
+        Compiled by Usama Bin Shahid. Quran text source: Tarteel QUL. Mapping references: AlQuran.cloud.
+      </div>
     </section>
 
     <section class="panel">
@@ -477,45 +655,6 @@
       <p class="sub" data-i18n="releaseSub">Each card is a tag release with downloadable files.</p>
       <div id="releaseGrid" class="release-grid"></div>
       <p id="releaseStatus" class="status" data-i18n="loadingReleases">Loading releases...</p>
-    </section>
-
-    <section class="panel">
-      <h2 data-i18n="guideTitle">Edition Guide</h2>
-      <p class="sub" data-i18n="guideSub">Choose the file based on your reader behavior.</p>
-      <table class="matrix" aria-label="Edition matrix">
-        <thead>
-          <tr>
-            <th data-i18n="colEdition">Edition</th>
-            <th data-i18n="colBestFor">Best For</th>
-            <th data-i18n="colProfile">Profile</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Holy_Quran_full.epub</strong></td>
-            <td data-i18n="row1Best">Modern Kindle and stable EPUB engines</td>
-            <td data-i18n="row1Profile">Enhanced typography, no surah chunking</td>
-          </tr>
-          <tr>
-            <td><strong>Holy_Quran_full_compat.epub</strong></td>
-            <td data-i18n="row2Best">Older or inconsistent EPUB readers</td>
-            <td data-i18n="row2Profile">Compatibility CSS with long-surah chunking</td>
-          </tr>
-          <tr>
-            <td><strong>Holy_Quran_lite.epub</strong></td>
-            <td data-i18n="row3Best">Low-memory readers needing faster flow</td>
-            <td data-i18n="row3Profile">Lighter profile with chunked long surahs</td>
-          </tr>
-          <tr>
-            <td><strong>Holy_Quran_lite_compat.epub</strong></td>
-            <td data-i18n="row4Best">Strict compatibility requirement</td>
-            <td data-i18n="row4Profile">Most conservative rendering profile</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="credit-box" data-i18n="creditBox">
-        Compiled by Usama Bin Shahid. Quran text source: Tarteel QUL. Mapping references: AlQuran.cloud.
-      </div>
     </section>
   </main>
 
@@ -526,19 +665,79 @@
     const releaseStatus = document.getElementById("releaseStatus");
     const langEn = document.getElementById("langEn");
     const langAr = document.getElementById("langAr");
+    const profileButtons = Array.from(document.querySelectorAll(".profile-btn"));
+    const recommendedFile = document.getElementById("recommendedFile");
+    const recommendedReason = document.getElementById("recommendedReason");
+    const recommendedSummary = document.getElementById("recommendedSummary");
+    const recommendedLink = document.getElementById("recommendedLink");
+    const heroRecommendedLink = document.getElementById("heroRecommendedLink");
+
+    const variants = {
+      full: {
+        file: "Holy_Quran_full.epub",
+        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub",
+        summaryKey: "variantFullSummary"
+      },
+      full_compat: {
+        file: "Holy_Quran_full_compat.epub",
+        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full_compat.epub",
+        summaryKey: "variantFullCompatSummary"
+      },
+      lite: {
+        file: "Holy_Quran_lite.epub",
+        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite.epub",
+        summaryKey: "variantLiteSummary"
+      },
+      lite_compat: {
+        file: "Holy_Quran_lite_compat.epub",
+        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite_compat.epub",
+        summaryKey: "variantLiteCompatSummary"
+      }
+    };
+
+    const profiles = {
+      kindle_modern: { variant: "full", reasonKey: "profileKindleModernReason" },
+      kindle_old: { variant: "full_compat", reasonKey: "profileKindleOldReason" },
+      android: { variant: "lite", reasonKey: "profileAndroidReason" },
+      strict: { variant: "lite_compat", reasonKey: "profileStrictReason" }
+    };
+
+    let currentProfile = "kindle_modern";
 
     const i18n = {
       en: {
         calligraphy: "القرآن الكريم",
         heroTitle: "Download Quran EPUB Editions",
-        heroSub: "Clean multi-edition downloads for Kindle and Android EPUB readers, with full and compatibility variants.",
+        heroSub: "A cleaner Quran EPUB experience with focused variants. Choose your reader profile and download the right file in one step.",
+        heroRecommended: "Download Recommended",
         openReleases: "Open Releases",
         viewRepo: "View Repository",
-        quickTitle: "Quick Downloads (Latest Release)",
-        quickSub: "One-click links for the latest published release.",
+        heroSideTitle: "Variant Snapshot",
+        heroSideSub: "All variants contain the same Quran text, with different rendering behavior.",
+        kpiVariants: "Variants",
+        kpiReady: "RTL Ready",
+        kpiSupport: "Devices",
+        smartTitle: "Smart Download Assistant",
+        smartSub: "Select your reading setup and get one recommended file.",
+        profileKindleModern: "Kindle (Modern)",
+        profileKindleOld: "Kindle (Older)",
+        profileAndroid: "Android EPUB Readers",
+        profileStrict: "Strict Compatibility",
+        profileKindleModernReason: "Best balance for modern Kindle firmware and stable EPUB engines.",
+        profileKindleOldReason: "Safer rendering path for older Kindle firmware and weaker engines.",
+        profileAndroidReason: "Lighter flow for Android readers and lower-memory devices.",
+        profileStrictReason: "Most conservative profile when layout glitches appear on your reader.",
+        recommendedForYou: "Recommended for you",
+        downloadNow: "Download Now",
         download: "Download",
         checksums: "Checksums",
-        quickNote: "Need a specific version? Use the release list below.",
+        quickNote: "Need a specific tag? Use the release list below.",
+        variantsTitle: "Variants At A Glance",
+        variantsSub: "Same Quran content, different rendering behavior for different devices.",
+        variantFullSummary: "Enhanced typography with no surah chunking. Best default for modern Kindle.",
+        variantFullCompatSummary: "Compatibility CSS and split long surahs for older EPUB engines.",
+        variantLiteSummary: "Lighter rendering profile with chunking for smoother flow on low-memory devices.",
+        variantLiteCompatSummary: "Most conservative compatibility profile for strict or unstable readers.",
         releaseTitle: "Release Assets By Tag",
         releaseSub: "Each card is a tag release with downloadable files.",
         loadingReleases: "Loading releases...",
@@ -546,32 +745,41 @@
         noAssets: "Releases found, but no EPUB assets detected.",
         showCount: (n) => `Showing ${n} release tag(s).`,
         fetchError: "Could not load release assets automatically. Use GitHub Releases directly.",
-        guideTitle: "Edition Guide",
-        guideSub: "Choose the file based on your reader behavior.",
-        colEdition: "Edition",
-        colBestFor: "Best For",
-        colProfile: "Profile",
-        row1Best: "Modern Kindle and stable EPUB engines",
-        row1Profile: "Enhanced typography, no surah chunking",
-        row2Best: "Older or inconsistent EPUB readers",
-        row2Profile: "Compatibility CSS with long-surah chunking",
-        row3Best: "Low-memory readers needing faster flow",
-        row3Profile: "Lighter profile with chunked long surahs",
-        row4Best: "Strict compatibility requirement",
-        row4Profile: "Most conservative rendering profile",
         creditBox: "Compiled by Usama Bin Shahid. Quran text source: Tarteel QUL. Mapping references: AlQuran.cloud."
       },
       ar: {
         calligraphy: "القرآن الكريم",
         heroTitle: "تحميل نسخ القرآن بصيغة EPUB",
-        heroSub: "صفحة نظيفة لتحميل نسخ متعددة مناسبة لكيندل وتطبيقات قراءة EPUB على أندرويد.",
+        heroSub: "تجربة تحميل أوضح للقرآن بصيغة EPUB. اختر نوع جهازك لتحصل على النسخة المناسبة مباشرة.",
+        heroRecommended: "تنزيل النسخة الموصى بها",
         openReleases: "فتح صفحة الإصدارات",
         viewRepo: "عرض المستودع",
-        quickTitle: "تنزيلات سريعة (أحدث إصدار)",
-        quickSub: "روابط مباشرة للتنزيل من أحدث وسم منشور.",
+        heroSideTitle: "نظرة سريعة على النسخ",
+        heroSideSub: "جميع النسخ تحتوي نفس نص القرآن، والاختلاف فقط في أسلوب العرض والتوافق.",
+        kpiVariants: "نسخ",
+        kpiReady: "جاهز RTL",
+        kpiSupport: "أجهزة",
+        smartTitle: "مساعد التنزيل الذكي",
+        smartSub: "اختر بيئة القراءة لديك لتحصل على توصية مباشرة بملف واحد.",
+        profileKindleModern: "Kindle (حديث)",
+        profileKindleOld: "Kindle (قديم)",
+        profileAndroid: "قارئات EPUB على أندرويد",
+        profileStrict: "توافق صارم",
+        profileKindleModernReason: "أفضل توازن لأجهزة Kindle الحديثة ومحركات EPUB المستقرة.",
+        profileKindleOldReason: "مسار عرض أكثر أمانًا للأجهزة القديمة والمحركات الأضعف.",
+        profileAndroidReason: "تدفق أخف لقارئات أندرويد والأجهزة محدودة الذاكرة.",
+        profileStrictReason: "الخيار الأكثر محافظة عند ظهور مشاكل عرض في برنامج القراءة.",
+        recommendedForYou: "التوصية المناسبة لك",
+        downloadNow: "تنزيل الآن",
         download: "تنزيل",
         checksums: "بصمات التحقق",
-        quickNote: "تحتاج إصدارًا محددًا؟ استخدم قائمة الإصدارات بالأسفل.",
+        quickNote: "تحتاج وسم إصدار محدد؟ استخدم قائمة الإصدارات بالأسفل.",
+        variantsTitle: "النسخ بشكل مختصر",
+        variantsSub: "المحتوى القرآني نفسه، مع اختلافات مخصصة لسلوك برامج القراءة.",
+        variantFullSummary: "تنسيق محسّن بدون تقسيم طويل للسور. الخيار الافتراضي الأفضل للأجهزة الحديثة.",
+        variantFullCompatSummary: "تنسيق توافق مع تقسيم السور الطويلة لمحركات EPUB الأقدم.",
+        variantLiteSummary: "نسخة أخف مع تقسيم السور لتدفق أسرع على الأجهزة الضعيفة.",
+        variantLiteCompatSummary: "أكثر ملف محافظ للتوافق عندما تكون محركات العرض غير مستقرة.",
         releaseTitle: "ملفات كل وسم إصدار",
         releaseSub: "كل بطاقة تمثل وسم إصدار يحتوي ملفات جاهزة للتنزيل.",
         loadingReleases: "جارٍ تحميل الإصدارات...",
@@ -579,19 +787,6 @@
         noAssets: "تم العثور على إصدارات لكن لم يتم العثور على ملفات EPUB.",
         showCount: (n) => `يتم عرض ${n} وسم إصدار.`,
         fetchError: "تعذر تحميل ملفات الإصدارات تلقائيًا. استخدم صفحة GitHub Releases مباشرة.",
-        guideTitle: "دليل اختيار النسخة",
-        guideSub: "اختر الملف المناسب حسب سلوك برنامج القراءة لديك.",
-        colEdition: "النسخة",
-        colBestFor: "الأفضل لـ",
-        colProfile: "الملف",
-        row1Best: "أجهزة Kindle الحديثة ومحركات EPUB المستقرة",
-        row1Profile: "تنسيق محسن بدون تقسيم طويل للسور",
-        row2Best: "برامج قراءة قديمة أو غير مستقرة",
-        row2Profile: "تنسيق توافق مع تقسيم السور الطويلة",
-        row3Best: "الأجهزة محدودة الذاكرة لسرعة أعلى",
-        row3Profile: "نسخة أخف مع تقسيم السور الطويلة",
-        row4Best: "أقصى توافق ممكن",
-        row4Profile: "أكثر ملف محافظ من ناحية العرض",
         creditBox: "إعداد وتجميع: أسامة بن شهيد. مصدر النص: ترتيل QUL. مراجع الخرائط: AlQuran.cloud."
       }
     };
@@ -626,6 +821,21 @@
       return i18n[currentLang][key];
     }
 
+    function updateRecommendation() {
+      const profile = profiles[currentProfile];
+      const variant = variants[profile.variant];
+
+      profileButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.profile === currentProfile);
+      });
+
+      recommendedFile.textContent = variant.file;
+      recommendedReason.textContent = t(profile.reasonKey);
+      recommendedSummary.textContent = t(variant.summaryKey);
+      recommendedLink.href = variant.url;
+      heroRecommendedLink.href = variant.url;
+    }
+
     function applyTranslations() {
       document.documentElement.lang = currentLang === "ar" ? "ar" : "en";
       document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
@@ -640,6 +850,7 @@
 
       langEn.setAttribute("aria-pressed", currentLang === "en" ? "true" : "false");
       langAr.setAttribute("aria-pressed", currentLang === "ar" ? "true" : "false");
+      updateRecommendation();
     }
 
     function releaseCard(release) {
@@ -710,6 +921,13 @@
       currentLang = "ar";
       applyTranslations();
       loadReleases();
+    });
+
+    profileButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentProfile = btn.dataset.profile;
+        updateRecommendation();
+      });
     });
 
     applyTranslations();
