@@ -21,7 +21,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name || github.ref }}
+          fetch-depth: 0
+
+      - name: Resolve target tag
+        id: resolve_tag
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            RAW_TAG="${{ github.event.inputs.tag_name }}"
+            TAG="${RAW_TAG#refs/tags/}"
+
+            if [[ -z "$TAG" ]]; then
+              echo "tag_name input is empty"
+              exit 1
+            fi
+
+            if [[ "$TAG" == *"*"* || "$TAG" == *"?"* || "$TAG" == *"["* ]]; then
+              echo "Invalid tag_name '$RAW_TAG'. Use an exact tag, for example: v1.1.0"
+              exit 1
+            fi
+
+            git fetch origin "refs/tags/$TAG:refs/tags/$TAG"
+            git checkout "refs/tags/$TAG"
+            echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -70,7 +95,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const tag = "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name || github.ref_name }}";
+            const tag = "${{ steps.resolve_tag.outputs.tag }}";
             try {
               const rel = await github.rest.repos.getReleaseByTag({
                 owner: context.repo.owner,
@@ -96,7 +121,7 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name || github.ref_name }}
+          tag_name: ${{ steps.resolve_tag.outputs.tag }}
           files: |
             releases/*.epub
             releases/SHA256SUMS.txt

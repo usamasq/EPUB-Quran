@@ -34,7 +34,7 @@ Each tagged release includes:
 - `Holy_Quran_lite_compat.epub`
 - `SHA256SUMS.txt`
 
-If an older tag is missing new variant files, run the **Release EPUB** workflow manually from GitHub Actions with the existing `tag_name` to refresh assets for that tag.
+If an older tag is missing new variant files, run the **Release EPUB** workflow manually from GitHub Actions with the existing exact `tag_name` (for example `v1.1.0`, not `v1.1*`) to refresh assets for that tag.
 
 ## Build Targets
 
