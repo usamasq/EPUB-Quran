@@ -104,7 +104,7 @@ python scripts/check_kindle_previewer.py --command-template "\"C:/Path/To/Kindle
 
 - Quran text source: [Tarteel QUL](https://qul.tarteel.ai/)
 - Structural mapping references: [AlQuran.cloud](https://alquran.cloud/)
-- Typeface: AlQalam Quran IndoPak
+- Typeface: Scheherazade New (SIL OFL) — optimized for accurate Quranic diacritical mark rendering
 
 ## CI and Release
 
