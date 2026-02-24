@@ -330,7 +330,6 @@ def build_css(target):
 }}
 
 html, body {{
-    direction: rtl;
     margin: 0;
     padding: 0;
 }}
@@ -345,7 +344,6 @@ body {{
 }}
 
 .main-wrapper {{
-    direction: rtl;
     text-align: right;
 }}
 
@@ -418,7 +416,6 @@ h1 {{
 }}
 
 .quran-text {{
-    direction: rtl;
     text-align: right;
     text-justify: auto;
     line-height: {quran_line_height};
@@ -464,7 +461,6 @@ h1 {{
 }}
 
 .credits-page {{
-    direction: ltr;
     text-align: left;
     font-family: 'Noto Sans', sans-serif;
     margin: 4% 2%;
@@ -783,7 +779,6 @@ def create_epub(structured, target, font_content):
     book.add_metadata(None, "meta", "", {"name": "ibooks:specified-fonts", "content": "true"})
     book.add_metadata(None, "meta", "", {"name": "specified-fonts", "content": "true"})
     book.add_metadata(None, "meta", "", {"name": "build-target", "content": target.key})
-    book.add_metadata(None, "meta", "", {"property": "dcterms:modified", "content": modified_utc})
 
     try:
         if font_content is None:

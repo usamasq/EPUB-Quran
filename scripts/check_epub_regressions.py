@@ -106,6 +106,7 @@ def run_checks(epub_path, expected_ayahs, expected_ruku_visible):
         validate_xml_and_links(zf, epub_path)
         counts = count_markers(zf)
         opf = zf.read("EPUB/content.opf").decode("utf-8", "replace")
+        css = zf.read("EPUB/style.css").decode("utf-8", "replace")
 
     if counts["ayah_end"] != expected_ayahs:
         raise AssertionError(
@@ -125,6 +126,12 @@ def run_checks(epub_path, expected_ayahs, expected_ruku_visible):
         raise AssertionError(f"{epub_path}: embedded font media type missing/incorrect")
     if 'page-progression-direction="rtl"' not in opf:
         raise AssertionError(f"{epub_path}: spine direction metadata missing")
+    if opf.count('property="dcterms:modified"') != 1:
+        raise AssertionError(f"{epub_path}: dcterms:modified meta must occur exactly once")
+    if 'property="dcterms:modified" content="' in opf:
+        raise AssertionError(f"{epub_path}: invalid dcterms:modified serialization detected")
+    if "direction:" in css:
+        raise AssertionError(f"{epub_path}: CSS must not contain direction property declarations")
 
     print(
         f"[PASS] {os.path.basename(epub_path)} "
