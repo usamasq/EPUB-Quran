@@ -13,7 +13,10 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:tanzil.net)",
       "WebFetch(domain:www.mobileread.com)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git restore:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
