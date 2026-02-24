@@ -1,19 +1,23 @@
+import argparse
+import io
 import json
-import re
-from collections import defaultdict
-from datetime import datetime, timezone
-from ebooklib import epub
 import os
+import re
+import shutil
+from collections import defaultdict
+from dataclasses import dataclass
+from datetime import datetime, timezone
+
+from ebooklib import epub
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 
 INPUT_JSON = os.path.join(PROJECT_ROOT, "data", "indopak.json")
 RUKU_MAP_JSON = os.path.join(PROJECT_ROOT, "data", "ruku_starts.json")
-PAGE_MAP_JSON = os.path.join(PROJECT_ROOT, "data", "page_map.json")
 FONT_PATH = os.path.join(PROJECT_ROOT, "assets", "fonts", "AlQalam-Quran-IndoPak.ttf")
 COVER_PATH = os.path.join(PROJECT_ROOT, "assets", "cover.png")
-OUTPUT_EPUB = os.path.join(PROJECT_ROOT, "releases", "Holy_Quran.epub")
+OUTPUT_DIR = os.path.join(PROJECT_ROOT, "releases")
 
 # =========================
 # EPUB METADATA CONFIGURATION
@@ -21,412 +25,930 @@ OUTPUT_EPUB = os.path.join(PROJECT_ROOT, "releases", "Holy_Quran.epub")
 BOOK_TITLE = "القرآن الكريم"
 BOOK_LANGUAGE = "ar"
 BOOK_IDENTIFIER = "holy-quran"
-BOOK_VERSION = "1.0"
 BOOK_AUTHOR = "Usama Bin Shahid (Compiler), Tarteel QUL (Text)"
 BOOK_PUBLISHER = "Usama Bin Shahid"
 
+ARABIC_END_MARK = "\u06DD"
+SAJDAH_SYMBOL = "\u06E9"
+RUB_EL_HIZB_SYMBOL = "\u06DE"
+HAIR_SPACE = "\u200A"
+QURANIC_MARK_PAIR_RE = re.compile(r"([\u06D6-\u06ED])([\u06D6-\u06ED])")
+TRAILING_AYAH_DIGITS_RE = re.compile(r"\s*[\u0660-\u0669\u06F0-\u06F90-9]+\s*$")
+PUA_RE = re.compile(r"[\uE000-\uF8FF]")
+
+
+@dataclass(frozen=True)
+class BuildTarget:
+    key: str
+    label: str
+    output_name: str
+    profile: str  # enhanced | compat
+    variant: str  # full | lite
+    split_threshold: int
+    show_juz: bool = True
+    show_ruku: bool = True
+    show_sajdah: bool = True
+
+
+BUILD_TARGETS = {
+    "full": BuildTarget(
+        key="full",
+        label="Full Edition (Enhanced)",
+        output_name="Holy_Quran_full.epub",
+        profile="enhanced",
+        variant="full",
+        split_threshold=0,
+    ),
+    "full_compat": BuildTarget(
+        key="full_compat",
+        label="Full Edition (Compatibility)",
+        output_name="Holy_Quran_full_compat.epub",
+        profile="compat",
+        variant="full",
+        split_threshold=110,
+    ),
+    "lite": BuildTarget(
+        key="lite",
+        label="Lite Edition (Enhanced)",
+        output_name="Holy_Quran_lite.epub",
+        profile="enhanced",
+        variant="lite",
+        split_threshold=90,
+    ),
+    "lite_compat": BuildTarget(
+        key="lite_compat",
+        label="Lite Edition (Compatibility)",
+        output_name="Holy_Quran_lite_compat.epub",
+        profile="compat",
+        variant="lite",
+        split_threshold=70,
+    ),
+}
+DEFAULT_TARGET_KEYS = ["full", "full_compat", "lite", "lite_compat"]
+
+
 # =========================
-# HELPER FUNCTIONS
+# HELPERS
 # =========================
 def to_arabic_number(n):
-    """Converts standard integers to Arabic numeral strings."""
     arabic_digits = "٠١٢٣٤٥٦٧٨٩"
     return "".join(arabic_digits[int(d)] for d in str(n))
+
 
 def load_json_map(filename):
     try:
         with open(filename, encoding="utf-8") as f:
             raw = json.load(f)
-        return {int(k): tuple(v) for k,v in raw.items()}
+        return {int(k): tuple(v) for k, v in raw.items()}
     except FileNotFoundError:
-        print(f"Warning: {filename} not found. Those markers will be skipped.")
+        print(f"Warning: {filename} not found. Related markers will be skipped.")
         return {}
 
-RUKU_MAP = load_json_map(RUKU_MAP_JSON)
-RUKU_LOOKUP = {tuple(v):k for k,v in RUKU_MAP.items()}
 
-PAGE_MAP = load_json_map(PAGE_MAP_JSON)
-# (surah, ayah) -> [page1, page2, ...] (usually just one)
-PAGE_LOOKUP = defaultdict(list)
-for pg, (s, a) in PAGE_MAP.items():
-    PAGE_LOOKUP[(s, a)].append(pg)
+def normalize_ayah_text(text):
+    strip_chars = [
+        ARABIC_END_MARK,
+        "\ufeff",
+        "\u200f",
+        "\u200b",
+        "\u2002",
+        "\u2003",
+        "\u200c",
+        "\u200d",
+    ]
+    for char_to_strip in strip_chars:
+        text = text.replace(char_to_strip, "")
 
-# Build RUKU_ENDS: maps (surah, ayah) -> surah_ruku_num (for the ENDING ayah of each ruku)
-def build_ruku_ends():
-    """Maps each ruku ENDING position to its surah-relative ruku number"""
-    from quran_maps import SURAH_NAMES
-    
-    ruku_ends = {}
-    ruku_starts_list = sorted(RUKU_MAP.items())  # [(global_ruku_num, (surah, ayah)), ...]
-    
-    # For each ruku, find where it ends
-    for idx, (global_ruku_num, (surah, ayah)) in enumerate(ruku_starts_list):
-        # Find the next ruku start position
-        if idx + 1 < len(ruku_starts_list):
-            next_global_ruku, (next_surah, next_ayah) = ruku_starts_list[idx + 1]
-            if next_surah == surah:
-                # Same surah, so this ruku ends at the ayah before the next ruku
-                ending_ayah = next_ayah - 1
-            else:
-                # Different surah, ruku ends at last ayah of current surah
-                # We'll handle this in build_surah_html by checking the total ayahs
-                ending_ayah = None
-        else:
-            # Last ruku in Quran, will be handled in build_surah_html
-            ending_ayah = None
-        
-        # Calculate surah-relative ruku number
-        surah_ruku_count = 0
-        for gn, (s, a) in ruku_starts_list:
-            if s == surah and gn <= global_ruku_num:
-                surah_ruku_count += 1
-        
-        if ending_ayah is not None:
-            ruku_ends[(surah, ending_ayah)] = surah_ruku_count
-    
-    return ruku_ends
+    text = TRAILING_AYAH_DIGITS_RE.sub("", text)
+    text = PUA_RE.sub("", text)
 
-RUKU_ENDS = build_ruku_ends()
+    # Keep all consecutive Quranic marks visible by separating each pair.
+    while True:
+        updated = QURANIC_MARK_PAIR_RE.sub(rf"\1{HAIR_SPACE}\2", text)
+        if updated == text:
+            break
+        text = updated
 
-# =========================
-# SURAH NAMES & METADATA
-# =========================
-from quran_maps import SURAH_NAMES, JUZ_LOOKUP, SAJDAH_VERSES
+    return text
 
-# =========================
-# READER CSS
-# =========================
-GLOBAL_CSS = """
-@font-face {
-    font-family: 'AlQalamIndoPak';
-    src: url('fonts/AlQalam-Quran-IndoPak.ttf');
-    font-weight: normal;
-    font-style: normal;
-}
-body {
-    direction: rtl;
-    unicode-bidi: embed;
-    font-family: 'AlQalamIndoPak', serif !important;
-    font-weight: normal;
-    font-style: normal;
-    margin: 3% 5%;
-    color: #000;
-    background-color: #fff;
-    text-rendering: optimizeLegibility;
-    font-feature-settings: "liga" 1, "ccmp" 1;
-}
-.main-wrapper {
-    font-family: 'AlQalamIndoPak', serif !important;
-}
-h1 { text-align: center; color: #111; margin-top: 1.5em; margin-bottom: 1em; font-size: 2.2em; letter-spacing: 0.05em; }
 
-/* Beautification for Titles & Markers */
-.bismillah { text-align: center; font-size: 1.8em; margin-bottom: 1.5em; color: #111; line-height: 2; }
-.juz-marker { display: block; text-align: center; font-size: 1.1em; margin: 1em 0; color: #333; font-weight: bold; border-bottom: 2px solid #ccc; padding-bottom: 5px; clear: both; }
-.ruku-marker { display: inline-block; color: #666; margin: 0 0.5em; font-size: 0.85em; vertical-align: middle; font-weight: bold; border: 1px solid #ccc; border-radius: 50%; width: 1.6em; height: 1.6em; line-height: 1.6em; text-align: center; }
-.sajdah { color: darkred; font-size: 1.2em; margin: 0 0.4em; font-weight: bold; vertical-align: middle; }
+def collect_font_charset(structured):
+    chars = set()
 
-/* Page Indicator for E-ink/Readers */
-/* Page Indicator for E-ink/Readers - Removed per user request
-.page-marker { display: block; font-size: 0.7em; color: #888; text-align: left; margin: 1.5em 0; border-top: 1px solid #eee; padding-top: 0.5em; page-break-before: always; clear: both; }
-*/
-.ayah-end { white-space: nowrap; margin-right: 0.2em; }
+    for surah in structured.values():
+        for ayah_words in surah.values():
+            chars.update(normalize_ayah_text(" ".join(ayah_words)))
 
-/* Continuous Mushaf Flow Styling */
-.quran-text {
-    text-align: justify;
-    text-justify: inter-word;
-    line-height: 3.2; /* Increased to prevent marker clipping/overlap */
-    font-size: 1.6em;
-    word-spacing: 0; /* Resetting to prevent breaking ligatures */
-    letter-spacing: 0; /* Resetting to prevent breaking ligatures */
-    unicode-bidi: embed;
-}
-.ayah { 
-    display: inline; /* Forces continuous reading flow instead of list format */
-    unicode-bidi: isolate;
-}
-.surah-separator {
-    text-align: center;
-    font-size: 1.2em;
-    color: #ccc;
-    margin: 2em 0;
-    letter-spacing: 0.3em;
-    page-break-before: always;
-    clear: both;
-}
+    chars.update(BOOK_TITLE)
+    chars.update("بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ")
+    chars.update("الجزءع")
+    chars.update("۩۞")
+    chars.update("٠١٢٣٤٥٦٧٨٩")
 
-/* Title Page & Credits Page Styling */
-.title-page { text-align: center; margin-top: 30%; }
-.main-title { font-size: 3.5em; color: #111; margin-bottom: 0.2em; font-family: 'AlQalamIndoPak', serif !important; }
-.sub-title { font-size: 1.2em; color: #555; font-family: sans-serif; margin-top: 0; direction: ltr; }
-.ornament { font-size: 2em; color: #888; margin: 20px 0; }
+    for name in SURAH_NAMES.values():
+        chars.update(name)
 
-.credits-page { text-align: center; direction: ltr; margin: 10%; font-family: sans-serif; line-height: 1.8; color: #333; }
-.credits-page h2 { text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 30px; color: #222; }
-.credit-item { margin-bottom: 25px; background: #fdfdfd; padding: 20px; border-radius: 8px; border: 1px solid #eaeaea; text-align: left; }
-.credit-item strong { display: block; font-size: 1.1em; color: #111; margin-bottom: 5px; }
+    return "".join(sorted(chars))
 
-/* Dark Mode / Night Mode Support */
-@media (prefers-color-scheme: dark) {
-    body { color: #e0e0e0; background-color: #121212; }
-    h1, .bismillah, .main-title, .credits-page h2, .credit-item strong { color: #ffffff; }
-    .juz-marker { color: #dddddd; border-bottom-color: #444; }
-    .ruku-marker, .sub-title, .ornament { color: #666666; }
-    .surah-separator { color: #444; }
-    .credit-item { background: #1e1e1e; border-color: #333; color: #ccc; }
-    .sajdah { color: #ff6b6b; }
-}
-"""
 
-# =========================
-# LOAD QURAN
-# =========================
+def prepare_font_content(structured, subset_font):
+    if not os.path.exists(FONT_PATH):
+        return None
+
+    with open(FONT_PATH, "rb") as f:
+        full_content = f.read()
+
+    if not subset_font:
+        print("[FONT] Using full embedded font.")
+        return full_content
+
+    try:
+        from fontTools import subset
+    except ImportError:
+        print("[FONT] fontTools not installed; using full embedded font.")
+        return full_content
+
+    try:
+        options = subset.Options()
+        options.layout_features = ["*"]
+        options.name_IDs = ["*"]
+        options.name_languages = ["*"]
+        options.notdef_outline = True
+        options.recommended_glyphs = True
+        options.glyph_names = True
+        options.hinting = True
+
+        font = subset.load_font(FONT_PATH, options)
+        subsetter = subset.Subsetter(options=options)
+        subsetter.populate(text=collect_font_charset(structured))
+        subsetter.subset(font)
+
+        buffer = io.BytesIO()
+        subset.save_font(font, buffer, options)
+        data = buffer.getvalue()
+        print(f"[FONT] Embedded subset font generated ({len(data)} bytes).")
+        return data
+    except Exception as exc:
+        print(f"[FONT] Failed to subset font ({exc}); using full embedded font.")
+        return full_content
+
+
+def stylize_special_symbols(text, target):
+    has_sajdah_symbol = SAJDAH_SYMBOL in text
+    text = text.replace(RUB_EL_HIZB_SYMBOL, '<span class="rub-el-hizb">۞</span>')
+    if target.show_sajdah:
+        text = text.replace(SAJDAH_SYMBOL, '<span class="sajdah">۩</span>')
+    return text, has_sajdah_symbol
+
+
 def load_data():
     with open(INPUT_JSON, encoding="utf-8") as f:
         raw = json.load(f)
+
     structured = defaultdict(lambda: defaultdict(list))
-    for key in sorted(raw.keys(), key=lambda x: tuple(map(int,x.split(":")))):
+    for key in sorted(raw.keys(), key=lambda x: tuple(map(int, x.split(":")))):
         item = raw[key]
         s = int(item["surah"])
         a = int(item["ayah"])
         structured[s][a].append(item["text"])
+
     return structured
 
+
 # =========================
-# BUILD PAGES (TITLE & CREDITS)
+# QURAN MAPS
 # =========================
-def build_title_html():
-    return f"""<html dir="rtl">
+from quran_maps import SURAH_NAMES, JUZ_LOOKUP, SAJDAH_VERSES
+
+RUKU_MAP = load_json_map(RUKU_MAP_JSON)
+
+
+def build_ruku_metadata(surah_last_ayah):
+    ruku_ends = {}
+    surah_ruku_totals = defaultdict(int)
+    surah_ruku_index = defaultdict(int)
+    ruku_starts_list = sorted(RUKU_MAP.items())  # [(global_ruku_num, (surah, ayah)), ...]
+
+    for _, (surah, _) in ruku_starts_list:
+        surah_ruku_totals[surah] += 1
+
+    for idx, (_, (surah, _)) in enumerate(ruku_starts_list):
+        surah_ruku_index[surah] += 1
+
+        if idx + 1 < len(ruku_starts_list):
+            _, (next_surah, next_ayah) = ruku_starts_list[idx + 1]
+            if next_surah == surah:
+                ending_ayah = next_ayah - 1
+            else:
+                ending_ayah = surah_last_ayah.get(surah)
+        else:
+            ending_ayah = surah_last_ayah.get(surah)
+
+        if ending_ayah is not None:
+            ruku_ends[(surah, ending_ayah)] = surah_ruku_index[surah]
+
+    single_ruku_surahs = {s for s, total in surah_ruku_totals.items() if total <= 1}
+    return ruku_ends, single_ruku_surahs
+
+
+def plan_surah_sections(structured, split_threshold):
+    """
+    Returns:
+      - section_plan: {surah: [section_dict, ...]}
+      - ayah_to_file: {(surah, ayah): file_name}
+      - surah_first_file: {surah: file_name}
+    """
+    section_plan = {}
+    ayah_to_file = {}
+    surah_first_file = {}
+
+    for surah in sorted(structured.keys()):
+        ayah_numbers = sorted(structured[surah].keys())
+        if split_threshold > 0 and len(ayah_numbers) > split_threshold:
+            chunks = [ayah_numbers[i : i + split_threshold] for i in range(0, len(ayah_numbers), split_threshold)]
+        else:
+            chunks = [ayah_numbers]
+
+        sections = []
+        total_parts = len(chunks)
+        for idx, chunk in enumerate(chunks, 1):
+            if total_parts == 1:
+                file_name = f"surah_{surah}.xhtml"
+            else:
+                file_name = f"surah_{surah}_p{idx}.xhtml"
+
+            section = {
+                "file_name": file_name,
+                "ayah_numbers": chunk,
+                "part_index": idx,
+                "total_parts": total_parts,
+                "is_first": idx == 1,
+            }
+            sections.append(section)
+            for ayah in chunk:
+                ayah_to_file[(surah, ayah)] = file_name
+
+        section_plan[surah] = sections
+        surah_first_file[surah] = sections[0]["file_name"]
+
+    return section_plan, ayah_to_file, surah_first_file
+
+
+# =========================
+# RENDERING
+# =========================
+def build_css(target):
+    quran_font_size = "1.56em" if target.variant == "full" else "1.48em"
+    quran_line_height = "3.0" if target.variant == "full" else "2.8"
+    body_margin = "3% 5%" if target.variant == "full" else "2.8% 4.2%"
+    body_text = "#111111"
+    bg_color = "#fdfcf8"
+    card_bg = "#ffffff"
+    accent = "#174d35"
+    accent_soft = "#2a7d5e"
+
+    if target.profile == "compat":
+        advanced_typography = ""
+    else:
+        advanced_typography = """
+    font-feature-settings: "liga" 1, "ccmp" 1, "kern" 1;
+    text-rendering: optimizeLegibility;
+"""
+
+    return f"""
+@font-face {{
+    font-family: 'AlQalamIndoPak';
+    src: local('AlQalam Quran IndoPak'),
+         local('AlQalam-Quran-IndoPak'),
+         url('fonts/AlQalam-Quran-IndoPak.ttf') format('truetype');
+    font-display: swap;
+    font-weight: normal;
+    font-style: normal;
+}}
+
+html, body {{
+    direction: rtl;
+    margin: 0;
+    padding: 0;
+}}
+
+body {{
+    font-family: 'AlQalamIndoPak', 'Amiri', 'Scheherazade New', serif;
+    margin: {body_margin};
+    color: {body_text};
+    background-color: {bg_color};
+    -webkit-hyphens: none;
+    hyphens: none;
+}}
+
+.main-wrapper {{
+    direction: rtl;
+    text-align: right;
+}}
+
+h1 {{
+    text-align: center;
+    color: {accent};
+    margin: 1.2em 0 0.9em;
+    font-size: 2.12em;
+    letter-spacing: 0.02em;
+}}
+
+.bismillah {{
+    text-align: center;
+    font-size: 1.75em;
+    margin-bottom: 1.3em;
+    color: #0f3425;
+    line-height: 2;
+}}
+
+.juz-marker {{
+    display: block;
+    text-align: center;
+    font-size: 1.06em;
+    margin: 1em 0;
+    color: {accent_soft};
+    font-weight: bold;
+    border-bottom: 1px solid #d3ddd8;
+    padding-bottom: 0.32em;
+    clear: both;
+}}
+
+.ruku-marker {{
+    display: inline-block;
+    color: {accent};
+    margin: 0 0.42em;
+    font-size: 0.82em;
+    vertical-align: middle;
+    font-weight: bold;
+    border: 1px solid #b7c9c1;
+    border-radius: 50%;
+    width: 1.64em;
+    height: 1.64em;
+    line-height: 1.64em;
+    text-align: center;
+}}
+
+.sajdah {{
+    color: #8a1414;
+    font-size: 1.18em;
+    margin: 0 0.34em;
+    font-weight: bold;
+    vertical-align: middle;
+}}
+
+.rub-el-hizb {{
+    color: #575f17;
+    font-size: 1.06em;
+    margin: 0 0.15em;
+    vertical-align: baseline;
+}}
+
+.ayah-end {{
+    white-space: nowrap;
+    margin-right: 0.2em;
+    font-size: 0.98em;
+}}
+
+.ayah-anchor {{
+    display: inline;
+}}
+
+.quran-text {{
+    direction: rtl;
+    text-align: right;
+    text-justify: auto;
+    line-height: {quran_line_height};
+    font-size: {quran_font_size};
+    word-spacing: 0;
+    letter-spacing: normal;
+    word-break: keep-all;
+    overflow-wrap: normal;
+{advanced_typography}
+}}
+
+.part-title {{
+    text-align: center;
+    font-size: 1em;
+    color: #5f665f;
+    margin: 0 0 1.1em;
+}}
+
+.surah-separator {{
+    text-align: center;
+    font-size: 1.2em;
+    color: #b5beb9;
+    margin: 1.8em 0 1.4em;
+    letter-spacing: 0.3em;
+    page-break-before: always;
+}}
+
+.title-page {{
+    text-align: center;
+    margin-top: 28%;
+}}
+
+.main-title {{
+    font-size: 3.2em;
+    color: {accent};
+    margin-bottom: 0.14em;
+}}
+
+.edition-badge {{
+    direction: ltr;
+    display: inline-block;
+    font-family: 'Noto Sans', sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid #c6d5ce;
+    color: #375447;
+    padding: 0.26em 0.8em;
+    border-radius: 999px;
+    margin-bottom: 1.1em;
+    font-size: 0.74em;
+}}
+
+.ornament {{
+    font-size: 2em;
+    color: #8d9b95;
+    margin: 0.6em 0;
+}}
+
+.credits-page {{
+    direction: ltr;
+    text-align: left;
+    font-family: 'Noto Sans', sans-serif;
+    margin: 4% 2%;
+    color: #25302d;
+    line-height: 1.66;
+}}
+
+.credits-header {{
+    border-bottom: 1px solid #cfd9d4;
+    padding-bottom: 0.8em;
+    margin-bottom: 1.6em;
+}}
+
+.credits-title {{
+    font-size: 1.65em;
+    color: #103828;
+    margin-bottom: 0.25em;
+}}
+
+.credits-sub {{
+    color: #50635c;
+    font-size: 0.96em;
+}}
+
+.signature {{
+    background: #eef4f1;
+    border: 1px solid #d5e3dc;
+    border-left: 4px solid {accent};
+    border-radius: 10px;
+    padding: 0.85em 0.95em;
+    margin: 1em 0 1.5em;
+}}
+
+.signature strong {{
+    color: #123e2c;
+}}
+
+.credit-grid {{
+    display: block;
+}}
+
+.credit-card {{
+    background: {card_bg};
+    border: 1px solid #d9e2dd;
+    border-radius: 12px;
+    padding: 0.95em 1em;
+    margin-bottom: 0.8em;
+}}
+
+.credit-card h3 {{
+    margin: 0 0 0.25em;
+    font-size: 1.02em;
+    color: #1a4c37;
+}}
+
+.build-meta {{
+    margin-top: 1.4em;
+    color: #61726b;
+    font-size: 0.88em;
+    border-top: 1px dashed #d7dfdb;
+    padding-top: 0.8em;
+}}
+
+.index-list {{
+    margin: 0.8em 3%;
+    line-height: 2;
+}}
+
+.index-item {{
+    margin-bottom: 0.4em;
+    font-size: 1.13em;
+    border-bottom: 1px solid #e0e5e3;
+    padding-bottom: 0.35em;
+}}
+
+.index-link {{
+    text-decoration: none;
+    color: inherit;
+}}
+
+@media (prefers-color-scheme: dark) {{
+    body {{
+        color: #e8efec;
+        background-color: #0f1714;
+    }}
+    h1, .main-title {{
+        color: #90c8ae;
+    }}
+    .bismillah {{
+        color: #c7e8d9;
+    }}
+    .juz-marker {{
+        color: #9ad7b9;
+        border-bottom-color: #2d4b3f;
+    }}
+    .ruku-marker {{
+        color: #abdbc5;
+        border-color: #3b6251;
+    }}
+    .credits-page {{
+        color: #cfddda;
+    }}
+    .credits-header {{
+        border-bottom-color: #274136;
+    }}
+    .signature {{
+        background: #13201b;
+        border-color: #2a4338;
+    }}
+    .credit-card {{
+        background: #131d19;
+        border-color: #2a3f36;
+    }}
+    .build-meta {{
+        border-top-color: #264238;
+        color: #a6b9b2;
+    }}
+}}
+"""
+
+
+def build_title_html(target):
+    return f"""<html>
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Title Page</title></head>
-<body dir="rtl"><div class="main-wrapper" dir="rtl">
+<body><div class="main-wrapper">
     <div class="title-page">
+        <div class="edition-badge">{target.label}</div>
         <div class="ornament">﴾ ❖ ﴿</div>
         <h1 class="main-title">{BOOK_TITLE}</h1>
         <div class="ornament">﴾ ❖ ﴿</div>
     </div>
 </div></body></html>"""
 
-def build_credits_html():
-    return f"""<html dir="ltr">
+
+def build_credits_html(target):
+    built_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    return f"""<html>
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Attribution & Credits</title></head>
-<body dir="ltr"><div class="main-wrapper" dir="ltr">
+<body><div class="main-wrapper" dir="ltr">
     <div class="credits-page">
-        <h2>Attribution & Credits</h2>
-        <div class="credit-item">
-            <strong>Compilation & Formatting</strong>
-            This digital EPUB edition was meticulously compiled, formatted, and structured by <strong><a href="https://www.linkedin.com/in/usamasq/">{BOOK_PUBLISHER}</a></strong>.
+        <div class="credits-header">
+            <div class="credits-title">Attribution & Publication Credits</div>
+            <div class="credits-sub">Professional digital publication record for this Quran EPUB edition.</div>
         </div>
-        <div class="credit-item">
-            <strong>Text Data (JSON)</strong>
-            The authentic Indo-Pak Quranic text used in this digital publication was beautifully digitized and sourced from the <a href="https://qul.tarteel.ai/">Tarteel QUL</a> website.
+        <div class="signature">
+            Compiled, engineered, and curated by <strong>Usama Bin Shahid</strong>.<br/>
+            This edition is optimized for practical Quran reading across Kindle and Android EPUB engines.
         </div>
-        <div class="credit-item">
-            <strong>Typography</strong>
-            Typeset using the beautiful <em>AlQalam Quran IndoPak</em> font to ensure an authentic, traditional South Asian reading experience on e-readers.
+        <div class="credit-grid">
+            <div class="credit-card">
+                <h3>Quran Text Source</h3>
+                The authentic Indo-Pak Quranic text used in this publication is sourced from
+                <a href="https://qul.tarteel.ai/">Tarteel QUL</a>.
+            </div>
+            <div class="credit-card">
+                <h3>Structural Mapping</h3>
+                Juz and Ruku boundary mapping support was prepared using reference data from
+                <a href="https://alquran.cloud/">AlQuran.cloud</a>.
+            </div>
+            <div class="credit-card">
+                <h3>Typeface</h3>
+                Arabic text is rendered using the embedded AlQalam Quran IndoPak font for
+                consistent script behavior on constrained e-reader engines.
+            </div>
+            <div class="credit-card">
+                <h3>Edition Profile</h3>
+                {target.label}
+            </div>
         </div>
-        <div class="credit-item">
-            <strong>Metadata Mapping</strong>
-            Juz and Ruku boundary mappings were algorithmically mapped using the <a href="https://alquran.cloud/">AlQuran.cloud API</a>.
+        <div class="build-meta">
+            Publisher: {BOOK_PUBLISHER}<br/>
+            Build: {built_at}<br/>
+            License: MIT
         </div>
     </div>
-</body></html>"""
+</div></body></html>"""
 
-# =========================
-# BUILD SURAH FILE
-# =========================
-def build_surah_html(surah_num, ayahs):
+
+def build_surah_section_html(surah_num, ayahs, section, target, ruku_ends, single_ruku_surahs):
     arabic_num = to_arabic_number(surah_num)
-    name = f"{arabic_num}. {SURAH_NAMES.get(surah_num, f'Surah {surah_num}')}"
-    
-    html = f"""<html dir="rtl">
-<head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>{name}</title></head>
-<body dir="rtl"><div class="main-wrapper" dir="rtl"><h1>{name}</h1>"""
-    # Add visual separator before this surah (except the first one)
-    if surah_num > 1:
-        html += '<div class="surah-separator">✦ ✦ ✦</div>'
-    
-    if surah_num not in [1, 9]:
-        html += '<div class="bismillah" dir="rtl">بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ</div>'
+    surah_name = SURAH_NAMES.get(surah_num, f"Surah {surah_num}")
+    title = f"{arabic_num}. {surah_name}"
+    if section["total_parts"] > 1:
+        title = f"{title} (Part {section['part_index']}/{section['total_parts']})"
 
-    html += '<div class="quran-text" dir="rtl">' # Final Ayah numbers logic (as continuous text)
+    html = f"""<html>
+<head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>{title}</title></head>
+<body><div class="main-wrapper">"""
 
-    for ayah_num in sorted(ayahs.keys()):
-        # Collect indicators for this ayah
+    if section["is_first"]:
+        html += f"<h1>{arabic_num}. {surah_name}</h1>"
+        if surah_num > 1:
+            html += '<div class="surah-separator">✦ ✦ ✦</div>'
+        if surah_num not in [1, 9]:
+            html += '<div class="bismillah" dir="rtl">بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ</div>'
+    else:
+        html += (
+            f'<div class="part-title">{surah_name} — Part {section["part_index"]} '
+            f'of {section["total_parts"]}</div>'
+        )
+
+    html += '<div class="quran-text">'
+
+    for ayah_num in section["ayah_numbers"]:
         indicators_html = ""
-        
-        if (surah_num, ayah_num) in PAGE_LOOKUP:
-            for pg in PAGE_LOOKUP[(surah_num, ayah_num)]:
-                # We no longer need visible page markers as per user request
-                pass
+        if target.show_juz and (surah_num, ayah_num) in JUZ_LOOKUP:
+            indicators_html += (
+                f'<div class="juz-marker">'
+                f'الجزء {to_arabic_number(JUZ_LOOKUP[(surah_num, ayah_num)])}'
+                f"</div>"
+            )
+
+        if indicators_html:
+            html += f'</div>{indicators_html}<div class="quran-text">'
+
+        text = normalize_ayah_text(" ".join(ayahs[ayah_num]))
+        text, has_sajdah_symbol = stylize_special_symbols(text, target)
+        ayah_mark = f"{ARABIC_END_MARK}{to_arabic_number(ayah_num)}"
 
         if (surah_num, ayah_num) in JUZ_LOOKUP:
-            indicators_html += f'<div class=\"juz-marker\">الجزء {to_arabic_number(JUZ_LOOKUP[(surah_num, ayah_num)])}</div>'
+            html += f'<span class="ayah-anchor" id="a{surah_num}_{ayah_num}"></span>'
 
-        # If we have indicators or this is the start of the surah (except first ayah of surah_1), 
-        # ensure we close previous quran-text block and open a new one.
-        if indicators_html:
-            html += f'</div>{indicators_html}<div class="quran-text" dir="rtl">'
-
-        # 1. Join the raw words
-        text = " ".join(ayahs[ayah_num])
-        
-        # 2. Strip existing \u06DD, strip raw Arabic digits, and strip invisible/control characters
-        # \ufeff: BOM, \u200f: RLM, \u200b: ZWSP, \u2002: En Space, \u2003: Em Space, \u200c: ZWNJ, \u200d: ZWJ
-        strip_chars = ['\u06DD', '\ufeff', '\u200f', '\u200b', '\u2002', '\u2003', '\u200c', '\u200d']
-        for char_to_strip in strip_chars:
-            text = text.replace(char_to_strip, '')
-        
-        # Strip Arabic/Western digits from the end (usually the ayah marker in the source json)
-        text = re.sub(r'\s*[\u0660-\u0669\u06F0-\u06F90-9]+\s*$', '', text)
-        
-        # Strip private use area characters which are often font-specific artifacts
-        text = re.sub(r'[\uE000-\uF8FF]', '', text)
-        
-        # Add a hair space between consecutive mark characters that might overlap
-        # Waqf marks: 0x6d6-0x6dc (ۖۗۘۙۚۛۜ)
-        text = re.sub(r'([\u06d6-\u06dc])([\u06d6-\u06dc])', r'\1&#x200A;\2', text)
-        
-        # 3. Add the proper sequence back: \u06DD (End of Ayah Symbol) + The exact Ayah Number.
-        # Use Arabic digits (to_arabic_number) as many Indo-Pak fonts are specifically 
-        # tuned for Arabic digits when forming the enclosed-circle ligature.
-        # Prepare ayah text with RLM (Right-to-Left Mark) for stronger directionality hints
-        # \u200f is the Unicode RLM marker
-        ayah_text_content = f"\u200f{text}" # Apply RLM to the cleaned text
-        
-        # The ayah_mark is the symbol + number
-        ayah_mark = f"\u06DD{to_arabic_number(ayah_num)}"
-
-        # We add dir="rtl" to every span for granular control (Lithium/Android readers)
-        html += f'<span class="ayah" id="a{surah_num}_{ayah_num}" dir="rtl">{ayah_text_content}'
-        
-        # Add the Ayah end marker
+        html += text
         html += f' <span class="ayah-end">{ayah_mark}</span>'
-        
-        # Add ruku marker at the END of this ayah if it ends a ruku
-        if (surah_num, ayah_num) in RUKU_ENDS:
-            html += f' <span class="ruku-marker">ع{to_arabic_number(RUKU_ENDS[(surah_num, ayah_num)])}</span>'
-        
-        if (surah_num, ayah_num) in SAJDAH_VERSES:
+
+        if (
+            target.show_ruku
+            and (surah_num, ayah_num) in ruku_ends
+            and surah_num not in single_ruku_surahs
+        ):
+            html += f' <span class="ruku-marker">ع{to_arabic_number(ruku_ends[(surah_num, ayah_num)])}</span>'
+
+        if target.show_sajdah and (surah_num, ayah_num) in SAJDAH_VERSES and not has_sajdah_symbol:
             html += '&nbsp;<span class="sajdah">۩</span>'
-        
-        html += ' </span>'
+
+        html += " "
 
     html += "</div></div></body></html>"
-    html = html.replace('<div class="quran-text"></div>', '')
+    html = html.replace('<div class="quran-text"></div>', "")
     return html
 
-# =========================
-# JUZ (PARAH) INDEX
-# =========================
-def build_juz_index():
-    html = '<html dir="rtl"><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body dir="rtl"><div class="main-wrapper" dir="rtl">'
-    html += '<h1>فهرس الأجزاء</h1>'
-    html += '<div style="margin: 20px 5%; line-height: 2;">'
-    
+
+def build_juz_index(ayah_to_file):
+    html = '<html><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body><div class="main-wrapper">'
+    html += "<h1>فهرس الأجزاء</h1>"
+    html += '<div class="index-list">'
+
     juz_starts = {v: k for k, v in JUZ_LOOKUP.items()}
-    
     for j in range(1, 31):
         if j in juz_starts:
             s, a = juz_starts[j]
             surah_name = SURAH_NAMES.get(s, f"Surah {s}")
-            html += f'<div style="margin-bottom: 0.5em; font-size: 1.2em; border-bottom: 1px solid #eee; padding-bottom: 5px;"><a style="text-decoration: none; color: inherit;" href="surah_{s}.xhtml#a{s}_{a}">الجزء {to_arabic_number(j)} — {surah_name}</a></div>'
-            
-    html += "</div></body></html>"
+            target_file = ayah_to_file.get((s, a), f"surah_{s}.xhtml")
+            html += (
+                f'<div class="index-item"><a class="index-link" href="{target_file}#a{s}_{a}">'
+                f"الجزء {to_arabic_number(j)} — {surah_name}</a></div>"
+            )
+
+    html += "</div></div></body></html>"
     return html
 
-# =========================
-# SURAH INDEX
-# =========================
-def build_surah_index():
-    html = '<html dir="rtl"><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body dir="rtl"><div class="main-wrapper" dir="rtl">'
-    html += '<h1>فهرس السور</h1>'
-    html += '<div style="margin: 20px 5%; line-height: 2;">'
-    
+
+def build_surah_index(surah_first_file):
+    html = '<html><head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/></head><body><div class="main-wrapper">'
+    html += "<h1>فهرس السور</h1>"
+    html += '<div class="index-list">'
+
     for s in range(1, 115):
         surah_name = SURAH_NAMES.get(s, f"Surah {s}")
-        html += f'<div style="margin-bottom: 0.5em; font-size: 1.2em; border-bottom: 1px solid #eee; padding-bottom: 5px;"><a style="text-decoration: none; color: inherit;" href="surah_{s}.xhtml">{to_arabic_number(s)}. {surah_name}</a></div>'
-            
-    html += "</div></body></html>"
+        href = surah_first_file.get(s, f"surah_{s}.xhtml")
+        html += (
+            f'<div class="index-item"><a class="index-link" href="{href}">'
+            f"{to_arabic_number(s)}. {surah_name}</a></div>"
+        )
+
+    html += "</div></div></body></html>"
     return html
+
 
 # =========================
 # EPUB CREATION
 # =========================
-def create_epub(structured):
+def create_epub(structured, target, font_content):
+    surah_last_ayah = {s: max(ayahs.keys()) for s, ayahs in structured.items()}
+    ruku_ends, single_ruku_surahs = build_ruku_metadata(surah_last_ayah)
+    section_plan, ayah_to_file, surah_first_file = plan_surah_sections(structured, target.split_threshold)
+
     book = epub.EpubBook()
-    
     book.set_title(BOOK_TITLE)
     book.set_language(BOOK_LANGUAGE)
     book.direction = "rtl"
-    book.set_identifier(BOOK_IDENTIFIER)
+    book.set_identifier(f"{BOOK_IDENTIFIER}-{target.key}")
     book.add_author(BOOK_AUTHOR)
-    
+
+    modified_utc = datetime.now(timezone.utc).isoformat()
     book.add_metadata("DC", "publisher", BOOK_PUBLISHER)
-    # Corrected Kindle metadata hint
-    book.add_metadata(None, 'meta', '', {'name': 'specified-fonts', 'content': 'true'})
+    book.add_metadata("DC", "description", f"{BOOK_TITLE} — {target.label}")
     book.add_metadata("DC", "subject", "Religion, Islam, Quran")
-    book.add_metadata("DC", "description", "The Holy Quran featuring an authentic Indo-Pak script format. Built with complete Juz/Parah and Ruku navigation tailored specifically for modern e-readers and Kindle devices.")
-    book.add_metadata("DC", "date", datetime.now(timezone.utc).isoformat())
+    book.add_metadata("DC", "date", modified_utc)
+    book.add_metadata("DC", "source", "https://qul.tarteel.ai/")
+    book.add_metadata("DC", "rights", "Released under the MIT License")
+    book.add_metadata(None, "meta", "", {"name": "ibooks:specified-fonts", "content": "true"})
+    book.add_metadata(None, "meta", "", {"name": "specified-fonts", "content": "true"})
+    book.add_metadata(None, "meta", "", {"name": "build-target", "content": target.key})
+    book.add_metadata(None, "meta", "", {"property": "dcterms:modified", "content": modified_utc})
 
     try:
-        with open(FONT_PATH,"rb") as f:
-            font_content = f.read()
-        # Use application/x-font-ttf for better compatibility
-        font_item = epub.EpubItem(uid="font", file_name="fonts/AlQalam-Quran-IndoPak.ttf", media_type="application/x-font-ttf", content=font_content)
+        if font_content is None:
+            raise FileNotFoundError(FONT_PATH)
+        font_item = epub.EpubItem(
+            uid="font",
+            file_name="fonts/AlQalam-Quran-IndoPak.ttf",
+            media_type="application/vnd.ms-opentype",
+            content=font_content,
+        )
         book.add_item(font_item)
     except FileNotFoundError:
         print(f"Warning: Font {FONT_PATH} not found. EPUB will be built without embedded font.")
 
     if os.path.exists(COVER_PATH):
-        book.set_cover("cover.png", open(COVER_PATH, 'rb').read())
+        with open(COVER_PATH, "rb") as f:
+            book.set_cover("cover.png", f.read())
     else:
         print(f"Warning: Cover {COVER_PATH} not found.")
 
-    style = epub.EpubItem(uid="style", file_name="style.css", media_type="text/css", content=GLOBAL_CSS)
+    style = epub.EpubItem(uid="style", file_name="style.css", media_type="text/css", content=build_css(target))
     book.add_item(style)
 
     spine = []
     toc = []
 
-    title_page = epub.EpubHtml(title="Title Page", file_name="title_page.xhtml", lang="ar", content=build_title_html())
+    title_page = epub.EpubHtml(
+        title="Title Page",
+        file_name="title_page.xhtml",
+        lang="ar",
+        content=build_title_html(target),
+    )
+    title_page.direction = "rtl"
     title_page.add_item(style)
     book.add_item(title_page)
     spine.append(title_page)
 
-    credits_page = epub.EpubHtml(title="Attribution & Credits", file_name="credits_page.xhtml", lang="en", content=build_credits_html())
+    credits_page = epub.EpubHtml(
+        title="Attribution & Credits",
+        file_name="credits_page.xhtml",
+        lang="en",
+        content=build_credits_html(target),
+    )
+    credits_page.direction = "ltr"
     credits_page.add_item(style)
     book.add_item(credits_page)
     spine.append(credits_page)
 
-    if JUZ_LOOKUP:
-        juz_index = epub.EpubHtml(title="فهرس الأجزاء", file_name="index_juz.xhtml", lang="ar", content=build_juz_index())
+    if target.show_juz and JUZ_LOOKUP:
+        juz_index = epub.EpubHtml(
+            title="فهرس الأجزاء",
+            file_name="index_juz.xhtml",
+            lang="ar",
+            content=build_juz_index(ayah_to_file),
+        )
+        juz_index.direction = "rtl"
         juz_index.add_item(style)
         book.add_item(juz_index)
         spine.append(juz_index)
         toc.append(juz_index)
 
-    surah_index = epub.EpubHtml(title="فهرس السور", file_name="index_surah.xhtml", lang="ar", content=build_surah_index())
+    surah_index = epub.EpubHtml(
+        title="فهرس السور",
+        file_name="index_surah.xhtml",
+        lang="ar",
+        content=build_surah_index(surah_first_file),
+    )
+    surah_index.direction = "rtl"
     surah_index.add_item(style)
     book.add_item(surah_index)
     spine.append(surah_index)
     toc.append(surah_index)
 
-    for s in structured.keys():
-        chapter = epub.EpubHtml(title=f"{to_arabic_number(s)}. {SURAH_NAMES.get(s, str(s))}", file_name=f"surah_{s}.xhtml", lang="ar", content=build_surah_html(s, structured[s]))
-        chapter.add_item(style)
-        book.add_item(chapter)
-        spine.append(chapter)
-        toc.append(chapter)
+    for surah in sorted(structured.keys()):
+        surah_name = SURAH_NAMES.get(surah, str(surah))
+        for section in section_plan[surah]:
+            chapter_title = f"{to_arabic_number(surah)}. {surah_name}"
+            if section["total_parts"] > 1:
+                chapter_title += f" (Part {section['part_index']}/{section['total_parts']})"
+
+            chapter = epub.EpubHtml(
+                title=chapter_title,
+                file_name=section["file_name"],
+                lang="ar",
+                content=build_surah_section_html(
+                    surah,
+                    structured[surah],
+                    section,
+                    target,
+                    ruku_ends,
+                    single_ruku_surahs,
+                ),
+            )
+            chapter.direction = "rtl"
+            chapter.add_item(style)
+            book.add_item(chapter)
+            spine.append(chapter)
+            toc.append(chapter)
 
     book.toc = toc
     book.spine = spine
     book.add_item(epub.EpubNav())
     book.add_item(epub.EpubNcx())
-    
-    epub.write_epub(OUTPUT_EPUB, book)
+
+    output_path = os.path.join(OUTPUT_DIR, target.output_name)
+    epub.write_epub(
+        output_path,
+        book,
+        {
+            "compresslevel": 9,
+            "package_direction": True,
+            "epub3_pages": False,
+        },
+    )
+    return output_path
+
+
+def parse_targets(target_keys):
+    keys = target_keys or DEFAULT_TARGET_KEYS
+    unknown = [k for k in keys if k not in BUILD_TARGETS]
+    if unknown:
+        valid = ", ".join(sorted(BUILD_TARGETS.keys()))
+        raise ValueError(f"Unknown target(s): {', '.join(unknown)}. Valid targets: {valid}")
+    return [BUILD_TARGETS[k] for k in keys]
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Build Quran EPUB editions.")
+    parser.add_argument(
+        "--targets",
+        nargs="+",
+        help=f"Build targets ({', '.join(DEFAULT_TARGET_KEYS)}). Default: all",
+    )
+    parser.add_argument(
+        "--legacy-copy",
+        action="store_true",
+        help="Also copy full edition to releases/Holy_Quran.epub",
+    )
+    parser.add_argument(
+        "--no-subset-font",
+        action="store_true",
+        help="Disable font subsetting and embed the full font file.",
+    )
+    args = parser.parse_args()
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    structured = load_data()
+    font_content = prepare_font_content(structured, subset_font=not args.no_subset_font)
+    targets = parse_targets(args.targets)
+
+    built_files = []
+    for target in targets:
+        out = create_epub(structured, target, font_content)
+        built_files.append(out)
+        print(f"Built {target.key}: {out}")
+
+    if args.legacy_copy:
+        full_output = os.path.join(OUTPUT_DIR, BUILD_TARGETS["full"].output_name)
+        legacy_output = os.path.join(OUTPUT_DIR, "Holy_Quran.epub")
+        if os.path.exists(full_output):
+            shutil.copyfile(full_output, legacy_output)
+            built_files.append(legacy_output)
+            print(f"Legacy copy created: {legacy_output}")
+
+    print("Completed builds:")
+    for path in built_files:
+        print(f" - {path}")
+
 
 if __name__ == "__main__":
-    structured = load_data()
-    create_epub(structured)
-    print(f"Success! {OUTPUT_EPUB} generated with enhanced metadata and beautiful attribution pages.")
+    main()

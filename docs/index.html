@@ -1,279 +1,452 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPUB Quran v1.0 - Traditional Indo-Pak Script Edition</title>
-    <meta name="description"
-        content="A beautifully formatted digital edition of the Holy Quran in traditional Indo-Pak script, optimized for Kindle and E-ink e-readers.">
-    <meta name="keywords"
-        content="Quran EPUB, Indo-Pak Quran, Kindle Quran, South Asian Quran, Nastaliq Quran, E-ink Quran">
-    <meta name="author" content="Usama Bin Shahid">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EPUB Quran Editions</title>
+  <meta name="description" content="Download Quran EPUB editions (full, lite, compatibility builds) from tagged releases. Compiled by Usama Bin Shahid.">
+  <meta name="author" content="Usama Bin Shahid">
+  <meta property="og:title" content="EPUB Quran Editions">
+  <meta property="og:description" content="Multi-variant Quran EPUB builds for Kindle and Android readers.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,700&family=Public+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f6f2e8;
+      --paper-deep: #ebe2cf;
+      --ink: #1f2a23;
+      --muted: #57635c;
+      --brand: #1f6d4b;
+      --brand-soft: #2d8f63;
+      --line: #d6cfbf;
+      --card: #fffdf8;
+    }
 
-    <!-- Open Graph / AIO -->
-    <meta property="og:title" content="EPUB Quran - Indo-Pak Edition">
-    <meta property="og:description"
-        content="Premium digital Quran optimized for e-readers. Authentic Indo-Pak script and professional typography.">
-    <meta property="og:type" content="website">
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700&display=swap"
-        rel="stylesheet">
+    body {
+      font-family: "Public Sans", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 88% 8%, rgba(45, 143, 99, 0.12), transparent 34%),
+        radial-gradient(circle at 2% 98%, rgba(31, 109, 75, 0.15), transparent 35%),
+        var(--paper);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
 
-    <style>
-        :root {
-            --bg: #0a0c0b;
-            --text: #e0e0e0;
-            --accent: #2e7d32;
-            --gold: #d4af37;
-            --glass: rgba(255, 255, 255, 0.05);
-        }
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      background-image: radial-gradient(circle at 10% 20%, rgba(0,0,0,0.03), transparent 22%),
+                        radial-gradient(circle at 70% 60%, rgba(0,0,0,0.02), transparent 25%);
+      z-index: -1;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 20px 56px;
+    }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(160deg, rgba(255, 253, 247, 0.98), rgba(240, 235, 222, 0.98));
+      padding: 34px 26px;
+      margin-bottom: 20px;
+      animation: rise 0.65s ease-out both;
+    }
 
-        header {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
-            background: radial-gradient(circle at center, #1a2e23 0%, #0a0c0b 100%);
-        }
+    .hero h1 {
+      font-family: "Literata", serif;
+      font-size: clamp(2.1rem, 5vw, 3.3rem);
+      letter-spacing: 0.01em;
+      margin-bottom: 10px;
+      color: #143f2d;
+    }
 
-        .hero-pattern {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.1;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%23d4af37' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
-            z-index: 0;
-        }
+    .hero p {
+      max-width: 760px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
 
-        .content {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-        }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
 
-        .version-badge {
-            display: inline-block;
-            background: var(--glass);
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
+    .badge {
+      border: 1px solid #b7c9bd;
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #2e5645;
+      background: rgba(255,255,255,0.7);
+    }
 
-        h1 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 4rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--gold);
-            letter-spacing: -1px;
-            animation: fadeInDown 1s ease-out;
-        }
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
 
-        .subtitle {
-            font-size: 1.5rem;
-            font-weight: 300;
-            margin-bottom: 2.5rem;
-            color: var(--text);
-            opacity: 0.8;
-            animation: fadeInUp 1.2s ease-out;
-        }
+    .cta {
+      text-decoration: none;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      padding: 10px 14px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+      font-weight: 600;
+    }
 
-        .cta-container {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            animation: fadeIn 1.5s ease-in;
-        }
+    .cta-primary {
+      background: linear-gradient(130deg, var(--brand), var(--brand-soft));
+      color: #f8fffb;
+      box-shadow: 0 8px 18px rgba(31, 109, 75, 0.22);
+    }
 
-        .cta {
-            display: inline-block;
-            padding: 1rem 2rem;
-            background: linear-gradient(135deg, var(--accent), #1b5e20);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
+    .cta-secondary {
+      border-color: #b8c7bf;
+      color: #275141;
+      background: #fcfbf7;
+    }
 
-        .cta-secondary {
-            background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+    .cta:hover {
+      transform: translateY(-1px);
+    }
 
-        .cta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(46, 125, 50, 0.4);
-        }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 253, 248, 0.96);
+      padding: 22px 18px;
+      margin-bottom: 14px;
+      animation: rise 0.72s ease-out both;
+    }
 
-        .features {
-            padding: 5rem 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+    .panel h2 {
+      font-family: "Literata", serif;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      color: #1d4e39;
+      margin-bottom: 6px;
+    }
 
-        .feature-card {
-            background: var(--glass);
-            padding: 2.5rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            transition: border-color 0.3s ease;
-        }
+    .panel .sub {
+      color: var(--muted);
+      margin-bottom: 14px;
+      font-size: 0.96rem;
+    }
 
-        .feature-card:hover {
-            border-color: var(--gold);
-        }
+    .release-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
 
-        .feature-card h3 {
-            color: var(--gold);
-            margin-bottom: 1rem;
-            font-family: 'Outfit', sans-serif;
-        }
+    .release-card {
+      border: 1px solid #d4ccbc;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: fadeIn 0.45s ease-out both;
+    }
 
-        .attribution {
-            padding: 5rem 2rem;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.5);
-        }
+    .release-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
 
-        .attribution p {
-            max-width: 600px;
-            margin: 0 auto 1.5rem;
-            font-size: 1.1rem;
-            opacity: 0.7;
-        }
+    .release-tag {
+      font-weight: 700;
+      color: #184732;
+      letter-spacing: 0.02em;
+    }
 
-        footer {
-            padding: 2rem;
-            text-align: center;
-            font-size: 0.9rem;
-            opacity: 0.5;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
+    .release-date {
+      color: #68746e;
+      font-size: 0.82rem;
+    }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
+    .asset-list {
+      display: grid;
+      gap: 7px;
+    }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .asset-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-decoration: none;
+      border: 1px solid #d8d1c2;
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: #214f3c;
+      background: #fffcf4;
+      transition: border-color 0.18s ease, background-color 0.18s ease;
+      font-size: 0.9rem;
+    }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
+    .asset-link:hover {
+      border-color: #95b7a7;
+      background: #f5fbf7;
+    }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .asset-size {
+      color: #77837d;
+      font-size: 0.78rem;
+    }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
+    .credit-box {
+      border-left: 4px solid var(--brand);
+      background: #f0f8f4;
+      border-radius: 12px;
+      padding: 14px;
+      color: #244f3d;
+      margin-top: 8px;
+    }
 
-            to {
-                opacity: 1;
-            }
-        }
+    .matrix {
+      margin-top: 12px;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2.5rem;
-            }
+    .matrix th,
+    .matrix td {
+      border: 1px solid #dbd3c3;
+      padding: 8px 10px;
+      text-align: left;
+    }
 
-            .subtitle {
-                font-size: 1.1rem;
-            }
+    .matrix th {
+      background: #f1ebdc;
+      color: #2a5241;
+      font-weight: 700;
+    }
 
-            .cta-container {
-                flex-direction: column;
-            }
-        }
-    </style>
+    .status {
+      color: #5a6761;
+      font-size: 0.92rem;
+      margin-top: 4px;
+    }
+
+    .error {
+      color: #7d2f2f;
+      font-weight: 600;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .container {
+        padding: 16px 12px 44px;
+      }
+
+      .hero {
+        padding: 24px 16px;
+      }
+
+      .panel {
+        padding: 16px 12px;
+      }
+    }
+  </style>
 </head>
-
 <body>
-    <div class="hero-pattern"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <main class="container">
+    <section class="hero">
+      <div class="badge-row">
+        <span class="badge">EPUB Quran</span>
+        <span class="badge">Indo-Pak Script</span>
+        <span class="badge">Multi-Edition Builds</span>
+      </div>
+      <h1>Download Quran EPUB Editions</h1>
+      <p>
+        Tagged releases publish multiple EPUB files for different devices and rendering engines,
+        including full, lite, and compatibility-focused builds.
+      </p>
+      <div class="cta-row">
+        <a class="cta cta-primary" href="https://github.com/usamasq/EPUB-Quran/releases" target="_blank" rel="noopener">Open Releases</a>
+        <a class="cta cta-secondary" href="https://github.com/usamasq/EPUB-Quran" target="_blank" rel="noopener">View Repository</a>
+      </div>
+    </section>
 
-    <header>
-        <div class="content">
-            <span class="version-badge">Version 1.0 Release</span>
-            <h1>EPUB Quran</h1>
-            <p class="subtitle">Traditional Indo-Pak script. <br>Optimized for Kindle & E-ink.</p>
-            <div class="cta-container">
-                <a href="https://github.com/usamasq/EPUB-Quran/releases/download/v1.0/Holy_Quran.epub"
-                    class="cta">Download v1.0 EPUB</a>
-                <a href="https://github.com/usamasq/EPUB-Quran" class="cta cta-secondary">View Source on GitHub</a>
-            </div>
-        </div>
-    </header>
+    <section class="panel">
+      <h2>Release Assets By Tag</h2>
+      <p class="sub">
+        Each card below is a Git tag release. Use the exact EPUB file variant you need.
+      </p>
+      <div id="releaseGrid" class="release-grid"></div>
+      <p id="releaseStatus" class="status">Loading releases...</p>
+    </section>
 
-    <div class="features">
-        <div class="feature-card">
-            <h3>Authentic Script</h3>
-            <p>High-quality Nastaliq typography specifically optimized for digital screens.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Kindle Ready</h3>
-            <p>Custom fixes for Ayah markers and Waqf signs to ensure perfect rendering on e-readers.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Metadata Mapped</h3>
-            <p>Precisely mapped Juz and Ruku boundaries for easy navigation.</p>
-        </div>
-    </div>
+    <section class="panel">
+      <h2>Edition Guide</h2>
+      <p class="sub">Recommended by device behavior and rendering stability.</p>
+      <table class="matrix" aria-label="Edition matrix">
+        <thead>
+          <tr>
+            <th>Edition</th>
+            <th>Best For</th>
+            <th>Profile</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Holy_Quran_full.epub</strong></td>
+            <td>Modern Kindle / stable EPUB engines</td>
+            <td>Enhanced typography, no surah chunking</td>
+          </tr>
+          <tr>
+            <td><strong>Holy_Quran_full_compat.epub</strong></td>
+            <td>Older or inconsistent EPUB readers</td>
+            <td>Compatibility CSS + split long surahs</td>
+          </tr>
+          <tr>
+            <td><strong>Holy_Quran_lite.epub</strong></td>
+            <td>Faster loading on low-memory devices</td>
+            <td>Lighter visual profile + split long surahs</td>
+          </tr>
+          <tr>
+            <td><strong>Holy_Quran_lite_compat.epub</strong></td>
+            <td>Strict compatibility requirement</td>
+            <td>Most conservative layout + tighter chunking</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="credit-box">
+        Project compiled and maintained by <strong>Usama Bin Shahid</strong>.
+        Quran text source: Tarteel QUL. Structural mapping references: AlQuran.cloud.
+      </div>
+    </section>
+  </main>
 
-    <div class="attribution">
-        <p>A project by <strong><a href="https://www.linkedin.com/in/usamasq/" style="color: inherit;">Usama Bin
-                    Shahid</a></strong></p>
-        <p>Source text from <strong><a href="https://qul.tarteel.ai/" style="color: inherit;">Tarteel
-                    QUL</a></strong>. Mappings by <strong><a href="https://alquran.cloud/"
-                    style="color: inherit;">AlQuran.cloud</a></strong>. Typeset in
-            <strong>AlQalam IndoPak</strong>.
-        </p>
-    </div>
+  <script>
+    const OWNER = "usamasq";
+    const REPO = "EPUB-Quran";
+    const releaseGrid = document.getElementById("releaseGrid");
+    const releaseStatus = document.getElementById("releaseStatus");
 
-    <footer>
-        &copy; 2026 EPUB Quran Project. Open Source under MIT License.
-    </footer>
+    function formatDate(iso) {
+      const dt = new Date(iso);
+      return dt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes && bytes !== 0) return "";
+      const mb = bytes / (1024 * 1024);
+      return `${mb.toFixed(2)} MB`;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function releaseCard(release) {
+      const assets = (release.assets || []).filter(a => a.name.toLowerCase().endsWith(".epub") || a.name === "SHA256SUMS.txt");
+      if (!assets.length) return "";
+
+      const epubAssets = assets.filter(a => a.name.toLowerCase().endsWith(".epub"));
+      const checksumAsset = assets.find(a => a.name === "SHA256SUMS.txt");
+      const links = epubAssets.map(asset => {
+        return `
+          <a class="asset-link" href="${asset.browser_download_url}" target="_blank" rel="noopener">
+            <span>${escapeHtml(asset.name)}</span>
+            <span class="asset-size">${formatBytes(asset.size)}</span>
+          </a>
+        `;
+      }).join("");
+
+      const checksumLink = checksumAsset
+        ? `<a class="asset-link" href="${checksumAsset.browser_download_url}" target="_blank" rel="noopener"><span>SHA256SUMS.txt</span><span class="asset-size">checksums</span></a>`
+        : "";
+
+      return `
+        <article class="release-card">
+          <div class="release-head">
+            <span class="release-tag">${escapeHtml(release.tag_name)}</span>
+            <span class="release-date">${formatDate(release.published_at || release.created_at)}</span>
+          </div>
+          <div class="asset-list">
+            ${links}
+            ${checksumLink}
+          </div>
+        </article>
+      `;
+    }
+
+    async function loadReleases() {
+      try {
+        const url = `https://api.github.com/repos/${OWNER}/${REPO}/releases?per_page=15`;
+        const res = await fetch(url, { headers: { "Accept": "application/vnd.github+json" } });
+        if (!res.ok) throw new Error(`GitHub API responded ${res.status}`);
+        const releases = await res.json();
+        const usable = releases.filter(r => !r.draft && !r.prerelease);
+
+        if (!usable.length) {
+          releaseStatus.textContent = "No published releases found yet.";
+          return;
+        }
+
+        const html = usable.map(releaseCard).filter(Boolean).join("");
+        if (!html) {
+          releaseStatus.textContent = "Releases found, but no EPUB assets detected.";
+          return;
+        }
+
+        releaseGrid.innerHTML = html;
+        releaseStatus.textContent = `Showing ${usable.length} release tag(s).`;
+      } catch (err) {
+        releaseStatus.innerHTML = `<span class="error">Could not load release assets automatically.</span> Open the releases page directly.`;
+      }
+    }
+
+    loadReleases();
+  </script>
 </body>
-
 </html>
