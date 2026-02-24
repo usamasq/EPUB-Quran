@@ -10,6 +10,12 @@ Compiled and maintained by **[Usama Bin Shahid](https://www.linkedin.com/in/usam
 
 - **Static download page:** [https://usamasq.github.io/EPUB-Quran/](https://usamasq.github.io/EPUB-Quran/)
 - **Tagged releases:** [https://github.com/usamasq/EPUB-Quran/releases](https://github.com/usamasq/EPUB-Quran/releases)
+- **Latest direct downloads (one-click):**
+  - [Holy_Quran_full.epub](https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub)
+  - [Holy_Quran_full_compat.epub](https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full_compat.epub)
+  - [Holy_Quran_lite.epub](https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite.epub)
+  - [Holy_Quran_lite_compat.epub](https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite_compat.epub)
+  - [SHA256SUMS.txt](https://github.com/usamasq/EPUB-Quran/releases/latest/download/SHA256SUMS.txt)
 
 If someone lands on the repository homepage first, this section is the direct path to the static site and all downloadable EPUB variants.
 
@@ -26,8 +32,9 @@ Each tagged release includes:
 - `Holy_Quran_full_compat.epub`
 - `Holy_Quran_lite.epub`
 - `Holy_Quran_lite_compat.epub`
-- `Holy_Quran.epub` (legacy alias of `full`)
 - `SHA256SUMS.txt`
+
+If an older tag is missing new variant files, run the **Release EPUB** workflow manually from GitHub Actions with the existing `tag_name` to refresh assets for that tag.
 
 ## Build Targets
 
@@ -47,7 +54,7 @@ pip install -r requirements.txt
 Build all variants:
 
 ```bash
-python scripts/quran_reader_pro.py --legacy-copy
+python scripts/quran_reader_pro.py
 ```
 
 Build specific targets:

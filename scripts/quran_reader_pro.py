@@ -3,7 +3,6 @@ import io
 import json
 import os
 import re
-import shutil
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -18,6 +17,10 @@ RUKU_MAP_JSON = os.path.join(PROJECT_ROOT, "data", "ruku_starts.json")
 FONT_PATH = os.path.join(PROJECT_ROOT, "assets", "fonts", "AlQalam-Quran-IndoPak.ttf")
 COVER_PATH = os.path.join(PROJECT_ROOT, "assets", "cover.png")
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, "releases")
+PROJECT_REPO_URL = "https://github.com/usamasq/EPUB-Quran"
+PROJECT_RELEASES_URL = "https://github.com/usamasq/EPUB-Quran/releases"
+PROJECT_SITE_URL = "https://usamasq.github.io/EPUB-Quran/"
+PROJECT_CONTACT_URL = "https://www.linkedin.com/in/usamasq/"
 
 # =========================
 # EPUB METADATA CONFIGURATION
@@ -454,20 +457,6 @@ h1 {{
     margin-bottom: 0.14em;
 }}
 
-.edition-badge {{
-    direction: ltr;
-    display: inline-block;
-    font-family: 'Noto Sans', sans-serif;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    border: 1px solid #c6d5ce;
-    color: #375447;
-    padding: 0.26em 0.8em;
-    border-radius: 999px;
-    margin-bottom: 1.1em;
-    font-size: 0.74em;
-}}
-
 .ornament {{
     font-size: 2em;
     color: #8d9b95;
@@ -602,7 +591,6 @@ def build_title_html(target):
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Title Page</title></head>
 <body><div class="main-wrapper">
     <div class="title-page">
-        <div class="edition-badge">{target.label}</div>
         <div class="ornament">﴾ ❖ ﴿</div>
         <h1 class="main-title">{BOOK_TITLE}</h1>
         <div class="ornament">﴾ ❖ ﴿</div>
@@ -612,19 +600,37 @@ def build_title_html(target):
 
 def build_credits_html(target):
     built_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    other_variants = ", ".join(bt.output_name for key, bt in BUILD_TARGETS.items() if key != target.key)
     return f"""<html>
-<head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Attribution & Credits</title></head>
+<head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Publication Information</title></head>
 <body><div class="main-wrapper" dir="ltr">
     <div class="credits-page">
         <div class="credits-header">
-            <div class="credits-title">Attribution & Publication Credits</div>
-            <div class="credits-sub">Professional digital publication record for this Quran EPUB edition.</div>
+            <div class="credits-title">Publication Information</div>
+            <div class="credits-sub">Edition details, source references, and support/contact links for this EPUB.</div>
         </div>
         <div class="signature">
-            Compiled, engineered, and curated by <strong>Usama Bin Shahid</strong>.<br/>
-            This edition is optimized for practical Quran reading across Kindle and Android EPUB engines.
+            For feedback, complaints, or suggestions about this EPUB edition, please contact
+            <strong>Usama Bin Shahid</strong> via
+            <a href="{PROJECT_CONTACT_URL}">LinkedIn</a> or
+            <a href="{PROJECT_REPO_URL}/issues">GitHub Issues</a>.
         </div>
         <div class="credit-grid">
+            <div class="credit-card">
+                <h3>This Variant</h3>
+                {target.output_name} ({target.label})
+            </div>
+            <div class="credit-card">
+                <h3>Other Available Variants</h3>
+                {other_variants}<br/>
+                Download all variants from <a href="{PROJECT_RELEASES_URL}">GitHub Releases</a>.
+            </div>
+            <div class="credit-card">
+                <h3>Project Links</h3>
+                Repository: <a href="{PROJECT_REPO_URL}">{PROJECT_REPO_URL}</a><br/>
+                Releases: <a href="{PROJECT_RELEASES_URL}">{PROJECT_RELEASES_URL}</a><br/>
+                Static page: <a href="{PROJECT_SITE_URL}">{PROJECT_SITE_URL}</a>
+            </div>
             <div class="credit-card">
                 <h3>Quran Text Source</h3>
                 The authentic Indo-Pak Quranic text used in this publication is sourced from
@@ -640,15 +646,12 @@ def build_credits_html(target):
                 Arabic text is rendered using the embedded AlQalam Quran IndoPak font for
                 consistent script behavior on constrained e-reader engines.
             </div>
-            <div class="credit-card">
-                <h3>Edition Profile</h3>
-                {target.label}
-            </div>
         </div>
         <div class="build-meta">
             Publisher: {BOOK_PUBLISHER}<br/>
             Build: {built_at}<br/>
-            License: MIT
+            License: MIT<br/>
+            Contact: <a href="{PROJECT_CONTACT_URL}">{PROJECT_CONTACT_URL}</a>
         </div>
     </div>
 </div></body></html>"""
@@ -819,7 +822,7 @@ def create_epub(structured, target, font_content):
     spine.append(title_page)
 
     credits_page = epub.EpubHtml(
-        title="Attribution & Credits",
+        title="Publication Information",
         file_name="credits_page.xhtml",
         lang="en",
         content=build_credits_html(target),
@@ -915,11 +918,6 @@ def main():
         help=f"Build targets ({', '.join(DEFAULT_TARGET_KEYS)}). Default: all",
     )
     parser.add_argument(
-        "--legacy-copy",
-        action="store_true",
-        help="Also copy full edition to releases/Holy_Quran.epub",
-    )
-    parser.add_argument(
         "--no-subset-font",
         action="store_true",
         help="Disable font subsetting and embed the full font file.",
@@ -936,14 +934,6 @@ def main():
         out = create_epub(structured, target, font_content)
         built_files.append(out)
         print(f"Built {target.key}: {out}")
-
-    if args.legacy_copy:
-        full_output = os.path.join(OUTPUT_DIR, BUILD_TARGETS["full"].output_name)
-        legacy_output = os.path.join(OUTPUT_DIR, "Holy_Quran.epub")
-        if os.path.exists(full_output):
-            shutil.copyfile(full_output, legacy_output)
-            built_files.append(legacy_output)
-            print(f"Legacy copy created: {legacy_output}")
 
     print("Completed builds:")
     for path in built_files:

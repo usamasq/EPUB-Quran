@@ -158,6 +158,38 @@
       gap: 12px;
     }
 
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .quick-link {
+      text-decoration: none;
+      border: 1px solid #d2c9b8;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fffdf7;
+      color: #214f3c;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: border-color 0.18s ease, background-color 0.18s ease;
+      font-size: 0.91rem;
+    }
+
+    .quick-link:hover {
+      border-color: #8eb3a1;
+      background: #f1faf5;
+    }
+
+    .quick-note {
+      margin-top: 10px;
+      color: #5a6761;
+      font-size: 0.9rem;
+    }
+
     .release-card {
       border: 1px solid #d4ccbc;
       background: var(--card);
@@ -309,6 +341,33 @@
         <a class="cta cta-primary" href="https://github.com/usamasq/EPUB-Quran/releases" target="_blank" rel="noopener">Open Releases</a>
         <a class="cta cta-secondary" href="https://github.com/usamasq/EPUB-Quran" target="_blank" rel="noopener">View Repository</a>
       </div>
+    </section>
+
+    <section class="panel">
+      <h2>Quick Downloads (Latest Release)</h2>
+      <p class="sub">
+        One-click links for the most recent published tag on GitHub.
+      </p>
+      <div class="quick-grid">
+        <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub" target="_blank" rel="noopener">
+          <span>Holy_Quran_full.epub</span><span>Download</span>
+        </a>
+        <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full_compat.epub" target="_blank" rel="noopener">
+          <span>Holy_Quran_full_compat.epub</span><span>Download</span>
+        </a>
+        <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite.epub" target="_blank" rel="noopener">
+          <span>Holy_Quran_lite.epub</span><span>Download</span>
+        </a>
+        <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite_compat.epub" target="_blank" rel="noopener">
+          <span>Holy_Quran_lite_compat.epub</span><span>Download</span>
+        </a>
+        <a class="quick-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/SHA256SUMS.txt" target="_blank" rel="noopener">
+          <span>SHA256SUMS.txt</span><span>Checksums</span>
+        </a>
+      </div>
+      <p class="quick-note">
+        Need a specific tag instead of latest? Use the release cards below.
+      </p>
     </section>
 
     <section class="panel">
