@@ -1,5 +1,4 @@
 import argparse
-import io
 import json
 import os
 import re
@@ -14,7 +13,6 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 
 INPUT_JSON = os.path.join(PROJECT_ROOT, "data", "indopak.json")
 RUKU_MAP_JSON = os.path.join(PROJECT_ROOT, "data", "ruku_starts.json")
-FONT_PATH = os.path.join(PROJECT_ROOT, "assets", "fonts", "ScheherazadeNew-Regular.ttf")
 COVER_PATH = os.path.join(PROJECT_ROOT, "assets", "cover.png")
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, "releases")
 PROJECT_REPO_URL = "https://github.com/usamasq/EPUB-Quran"
@@ -133,68 +131,6 @@ def normalize_ayah_text(text):
         text = updated
 
     return text
-
-
-def collect_font_charset(structured):
-    chars = set()
-
-    for surah in structured.values():
-        for ayah_words in surah.values():
-            chars.update(normalize_ayah_text(" ".join(ayah_words)))
-
-    chars.update(BOOK_TITLE)
-    chars.update("بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ")
-    chars.update("الجزءع")
-    chars.update("۩۞")
-    chars.update(ARABIC_END_MARK)
-    chars.update("٠١٢٣٤٥٦٧٨٩")
-
-    for name in SURAH_NAMES.values():
-        chars.update(name)
-
-    return "".join(sorted(chars))
-
-
-def prepare_font_content(structured, subset_font):
-    if not os.path.exists(FONT_PATH):
-        return None
-
-    with open(FONT_PATH, "rb") as f:
-        full_content = f.read()
-
-    if not subset_font:
-        print("[FONT] Using full embedded font.")
-        return full_content
-
-    try:
-        from fontTools import subset
-    except ImportError:
-        print("[FONT] fontTools not installed; using full embedded font.")
-        return full_content
-
-    try:
-        options = subset.Options()
-        options.layout_features = ["*"]
-        options.name_IDs = ["*"]
-        options.name_languages = ["*"]
-        options.notdef_outline = True
-        options.recommended_glyphs = True
-        options.glyph_names = True
-        options.hinting = True
-
-        font = subset.load_font(FONT_PATH, options)
-        subsetter = subset.Subsetter(options=options)
-        subsetter.populate(text=collect_font_charset(structured))
-        subsetter.subset(font)
-
-        buffer = io.BytesIO()
-        subset.save_font(font, buffer, options)
-        data = buffer.getvalue()
-        print(f"[FONT] Embedded subset font generated ({len(data)} bytes).")
-        return data
-    except Exception as exc:
-        print(f"[FONT] Failed to subset font ({exc}); using full embedded font.")
-        return full_content
 
 
 def stylize_special_symbols(text, target):
@@ -320,20 +256,13 @@ def build_css(target):
 """
 
     return f"""
-@font-face {{
-    font-family: 'ScheherazadeNew';
-    src: url('fonts/ScheherazadeNew-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}}
-
 html, body {{
     margin: 0;
     padding: 0;
 }}
 
 body {{
-    font-family: 'ScheherazadeNew', 'Amiri Quran', 'Noto Naskh Arabic', serif;
+    font-family: serif;
     margin: {body_margin};
     color: {body_text};
     background-color: {bg_color};
@@ -634,8 +563,8 @@ def build_credits_html(target):
             </div>
             <div class="credit-card">
                 <h3>Typeface</h3>
-                Arabic text is rendered using the embedded Scheherazade New font (SIL OFL)
-                for accurate diacritical mark positioning on e-reader engines.
+                Arabic text uses each reader's native system serif/Arabic rendering stack,
+                including Kindle's built-in Arabic support on modern firmware.
             </div>
         </div>
         <div class="build-meta">
@@ -752,7 +681,7 @@ def build_surah_index(surah_first_file):
 # =========================
 # EPUB CREATION
 # =========================
-def create_epub(structured, target, font_content):
+def create_epub(structured, target):
     surah_last_ayah = {s: max(ayahs.keys()) for s, ayahs in structured.items()}
     ruku_ends, single_ruku_surahs = build_ruku_metadata(surah_last_ayah)
     section_plan, ayah_to_file, surah_first_file = plan_surah_sections(structured, target.split_threshold)
@@ -771,22 +700,7 @@ def create_epub(structured, target, font_content):
     book.add_metadata("DC", "date", modified_utc)
     book.add_metadata("DC", "source", "https://qul.tarteel.ai/")
     book.add_metadata("DC", "rights", "Released under the MIT License")
-    book.add_metadata(None, "meta", "", {"name": "ibooks:specified-fonts", "content": "true"})
-    book.add_metadata(None, "meta", "", {"name": "specified-fonts", "content": "true"})
     book.add_metadata(None, "meta", "", {"name": "build-target", "content": target.key})
-
-    try:
-        if font_content is None:
-            raise FileNotFoundError(FONT_PATH)
-        font_item = epub.EpubItem(
-            uid="font",
-            file_name="fonts/ScheherazadeNew-Regular.ttf",
-            media_type="application/x-font-truetype",
-            content=font_content,
-        )
-        book.add_item(font_item)
-    except FileNotFoundError:
-        print(f"Warning: Font {FONT_PATH} not found. EPUB will be built without embedded font.")
 
     if os.path.exists(COVER_PATH):
         with open(COVER_PATH, "rb") as f:
@@ -907,21 +821,15 @@ def main():
         nargs="+",
         help=f"Build targets ({', '.join(DEFAULT_TARGET_KEYS)}). Default: all",
     )
-    parser.add_argument(
-        "--no-subset-font",
-        action="store_true",
-        help="Disable font subsetting and embed the full font file.",
-    )
     args = parser.parse_args()
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     structured = load_data()
-    font_content = prepare_font_content(structured, subset_font=not args.no_subset_font)
     targets = parse_targets(args.targets)
 
     built_files = []
     for target in targets:
-        out = create_epub(structured, target, font_content)
+        out = create_epub(structured, target)
         built_files.append(out)
         print(f"Built {target.key}: {out}")
 

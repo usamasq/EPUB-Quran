@@ -88,7 +88,7 @@ python scripts/check_kindle_previewer.py --command-template "\"C:/Path/To/Kindle
 - Single-ruku surahs intentionally suppress ruku marker display.
 - Quranic annotation mark sequences are normalized with thin spacing to avoid overlap.
 - Sajdah symbols are styled consistently and deduplicated.
-- Embedded font metadata is tuned for broader EPUB engine compatibility.
+- Arabic rendering relies on each reader's native system serif/Arabic fonts (Kindle-first behavior).
 
 ## Device Matrix (Recommended)
 
@@ -104,7 +104,7 @@ python scripts/check_kindle_previewer.py --command-template "\"C:/Path/To/Kindle
 
 - Quran text source: [Tarteel QUL](https://qul.tarteel.ai/)
 - Structural mapping references: [AlQuran.cloud](https://alquran.cloud/)
-- Typeface: Scheherazade New (SIL OFL) — optimized for accurate Quranic diacritical mark rendering
+- Typeface strategy: native system serif/Arabic fonts per reader engine (no embedded body font)
 
 ## CI and Release
 
