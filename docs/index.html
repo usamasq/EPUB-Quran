@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EPUB Quran Editions | Download Full & Lite Variants</title>
+  <title>EPUB Quran | Download Quran EPUB Editions</title>
   <meta name="description" content="Download Quran EPUB editions (Full, Full Compat, Lite, Lite Compat) optimized for Kindle and Android readers.">
   <meta name="keywords" content="Quran EPUB, Kindle Quran, Indo-Pak Quran, EPUB download, Quran reader">
   <meta name="author" content="Usama Bin Shahid">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-  <meta name="theme-color" content="#0a0a0a">
+  <meta name="theme-color" content="#faf9f6" id="themeColorMeta">
 
   <link rel="canonical" href="https://usamasq.github.io/EPUB-Quran/">
   <link rel="alternate" hreflang="en" href="https://usamasq.github.io/EPUB-Quran/">
@@ -58,722 +58,486 @@
 
   <style>
     :root {
-      --bg: #0a0a0a;
-      --surface: #111111;
-      --surface-2: #161616;
-      --text: #f6f6f6;
-      --muted: #a4a4a4;
-      --line: #2a2a2a;
-      --line-soft: #1d1d1d;
-      --accent: #ffffff;
-      --success: #b6f0c8;
-      --radius: 14px;
-      --shadow: 0 1px 0 rgba(255, 255, 255, 0.03), 0 10px 24px rgba(0, 0, 0, 0.45);
+      --bg: #faf9f6;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --text-secondary: #6b7280;
+      --accent: #15573a;
+      --accent-hover: #0e3d28;
+      --accent-soft: #e8f5ee;
+      --border: #e5e5e5;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --radius: 12px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    [data-theme="dark"] {
+      --bg: #1a1d1e;
+      --surface: #242829;
+      --text: #e8e8e8;
+      --text-secondary: #9ca3af;
+      --accent: #6ee7a0;
+      --accent-hover: #5bd88e;
+      --accent-soft: #1e3a2b;
+      --border: #333838;
+      --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
     }
 
-    html, body {
-      min-height: 100%;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
 
     body {
-      font-family: "IBM Plex Sans", sans-serif;
-      background: radial-gradient(circle at 12% -10%, #1a1a1a 0%, #0a0a0a 42%),
-                  radial-gradient(circle at 100% 100%, #171717 0%, #0a0a0a 42%),
-                  var(--bg);
+      font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
       color: var(--text);
-      line-height: 1.55;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.11;
-      background-image:
-        radial-gradient(circle at 25px 25px, transparent 22px, rgba(255, 255, 255, 0.08) 23px, transparent 24px),
-        radial-gradient(circle at 75px 75px, transparent 22px, rgba(255, 255, 255, 0.05) 23px, transparent 24px);
-      background-size: 100px 100px;
-      z-index: -2;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .container {
-      max-width: 1120px;
+      max-width: 680px;
       margin: 0 auto;
-      padding: 20px 16px 52px;
+      padding: 0 20px;
+      width: 100%;
     }
 
+    /* ---- Top bar ---- */
     .topbar {
+      padding: 16px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
     }
 
     .brand {
-      font-size: 0.88rem;
-      color: var(--muted);
-      letter-spacing: 0.06em;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
       text-transform: uppercase;
     }
 
-    .lang-toggle {
-      display: inline-flex;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      overflow: hidden;
-      background: #111;
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .lang-btn {
+    .toggle-group {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .toggle-btn {
       border: 0;
       background: transparent;
-      color: var(--muted);
-      padding: 7px 11px;
+      color: var(--text-secondary);
+      padding: 6px 12px;
       font-size: 0.82rem;
       cursor: pointer;
-      transition: background-color 0.15s ease, color 0.15s ease;
+      transition: background-color 0.15s, color 0.15s;
+      font-family: inherit;
+      line-height: 1;
     }
 
-    .lang-btn[aria-pressed="true"] {
-      background: #f5f5f5;
-      color: #0b0b0b;
+    .toggle-btn[aria-pressed="true"] {
+      background: var(--accent);
+      color: #fff;
       font-weight: 600;
     }
 
-    .hero {
-      border: 1px solid var(--line);
-      background: linear-gradient(160deg, #131313 0%, #101010 100%);
-      border-radius: calc(var(--radius) + 4px);
-      padding: 28px 18px 22px;
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 12px;
+    [data-theme="dark"] .toggle-btn[aria-pressed="true"] {
+      color: #111;
     }
 
-    .hero::after {
-      content: "۞";
-      font-family: "Noto Naskh Arabic", serif;
-      position: absolute;
-      right: 16px;
-      top: 8px;
-      font-size: 4rem;
-      color: rgba(255, 255, 255, 0.08);
+    .theme-btn {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text-secondary);
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 1rem;
       line-height: 1;
-      pointer-events: none;
+      transition: border-color 0.15s, color 0.15s;
+      display: flex;
+      align-items: center;
     }
 
-    .arabic-calligraphy {
+    .theme-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .theme-btn .icon-sun,
+    .theme-btn .icon-moon { display: none; }
+
+    [data-theme="dark"] .theme-btn .icon-moon { display: inline; }
+    :root .theme-btn .icon-sun { display: inline; }
+    [data-theme="dark"] .theme-btn .icon-sun { display: none; }
+
+    /* ---- Hero ---- */
+    .hero {
+      text-align: center;
+      padding: 48px 0 40px;
+    }
+
+    .calligraphy {
       font-family: "Noto Naskh Arabic", serif;
-      font-size: clamp(1.4rem, 2.3vw, 1.9rem);
-      color: #e8e8e8;
-      margin-bottom: 6px;
-      letter-spacing: 0.01em;
-    }
-
-    h1 {
-      font-size: clamp(1.68rem, 4.2vw, 2.8rem);
-      letter-spacing: -0.02em;
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      color: var(--accent);
       margin-bottom: 8px;
       font-weight: 700;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
     }
 
     .hero-sub {
-      color: #c2c2c2;
-      margin-bottom: 14px;
-      max-width: 760px;
+      color: var(--text-secondary);
+      font-size: 1.02rem;
+      max-width: 480px;
+      margin: 0 auto;
     }
 
-    .hero-main {
-      min-width: 0;
-      max-width: 860px;
+    /* ---- Download section ---- */
+    .download-section {
+      padding-bottom: 48px;
     }
 
-    .hero-kpis {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
       margin-bottom: 12px;
-    }
-
-    .kpi {
-      border: 1px solid var(--line);
-      background: #151515;
-      border-radius: 999px;
-      padding: 6px 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 0.8rem;
-      color: #c9c9c9;
-    }
-
-    .kpi strong {
-      color: #ffffff;
-      font-size: 0.84rem;
-      font-weight: 700;
-    }
-
-    .sub-tight {
-      margin-bottom: 8px;
-      font-size: 0.86rem;
-    }
-
-    .cta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .btn {
-      border-radius: 10px;
-      border: 1px solid var(--line);
-      text-decoration: none;
-      color: var(--text);
-      padding: 9px 13px;
-      font-size: 0.9rem;
-      transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      border-color: #5c5c5c;
-    }
-
-    .btn-primary {
-      background: #f3f3f3;
-      color: #0c0c0c;
-      border-color: #f3f3f3;
-      font-weight: 600;
-    }
-
-    .panel {
-      border: 1px solid var(--line);
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 16px 14px;
-      box-shadow: var(--shadow);
-      margin-bottom: 10px;
-    }
-
-    .panel h2 {
-      font-size: clamp(1.12rem, 2.2vw, 1.46rem);
-      margin-bottom: 4px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-
-    .sub {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin-bottom: 10px;
     }
 
     .profile-group {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
 
     .profile-btn {
-      border: 1px solid var(--line);
-      background: #131313;
-      color: #d1d1d1;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
       border-radius: 999px;
-      padding: 8px 11px;
-      font-size: 0.84rem;
+      padding: 8px 16px;
+      font-size: 0.88rem;
       cursor: pointer;
-      transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+      transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+      font-family: inherit;
     }
 
     .profile-btn:hover {
-      border-color: #535353;
-      color: #efefef;
+      border-color: var(--accent);
     }
 
     .profile-btn.active {
-      background: #f3f3f3;
-      color: #0c0c0c;
-      border-color: #f3f3f3;
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
       font-weight: 600;
+    }
+
+    [data-theme="dark"] .profile-btn.active {
+      color: #111;
     }
 
     .recommend-card {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #151515;
-      padding: 12px;
-    }
-
-    .recommend-head {
-      display: flex;
-      gap: 12px;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .recommend-head h3 {
-      font-size: 1.05rem;
-      margin-bottom: 5px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
     }
 
     .recommend-label {
-      color: #b6f0c8;
-      font-size: 0.78rem;
-      margin-bottom: 4px;
-      letter-spacing: 0.03em;
+      font-size: 0.75rem;
+      font-weight: 600;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .recommend-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
       font-weight: 600;
     }
 
-    .recommend-link {
-      min-width: 150px;
+    .recommend-reason {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 16px;
     }
 
-    .quick-link,
-    .asset-link {
-      text-decoration: none;
-      color: #e8e8e8;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: var(--surface-2);
-      padding: 9px 10px;
+    .download-row {
       display: flex;
-      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      transition: border-color 0.15s ease, background-color 0.15s ease;
-      font-size: 0.87rem;
-    }
-
-    .quick-link:hover,
-    .asset-link:hover {
-      border-color: #5b5b5b;
-      background: #191919;
-    }
-
-    .asset-size {
-      color: #b9b9b9;
-      font-size: 0.79rem;
-      white-space: nowrap;
-    }
-
-    .release-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 9px;
-    }
-
-    .variant-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 8px;
-    }
-
-    .variant-card {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--surface-2);
-      padding: 11px;
-      display: grid;
-      gap: 8px;
-      align-content: start;
-    }
-
-    .variant-card h3 {
-      font-size: 0.95rem;
-      margin: 0;
-    }
-
-    .variant-card p {
-      font-size: 0.86rem;
-      color: #c6c6c6;
-      margin: 0;
-      min-height: 54px;
-    }
-
-    .release-card {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--surface-2);
-      padding: 11px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .release-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 8px;
-    }
-
-    .release-tag {
-      font-weight: 700;
-      font-size: 0.94rem;
-      color: var(--accent);
-    }
-
-    .release-date {
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
-
-    .asset-list {
-      display: grid;
-      gap: 7px;
-    }
-
-    .credit-box {
-      margin-top: 10px;
-      border: 1px dashed #3a3a3a;
+      background: var(--accent);
+      color: #fff;
+      border: none;
       border-radius: 10px;
-      padding: 10px;
-      color: #cecece;
-      font-size: 0.9rem;
-      background: #121212;
-    }
-
-    .status {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .error {
-      color: #f0b4b4;
+      padding: 12px 24px;
+      font-size: 0.95rem;
       font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.15s, transform 0.1s;
+      font-family: inherit;
     }
 
-    [data-lang="ar"] .arabic-calligraphy {
-      text-align: right;
+    .btn-download:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
     }
 
+    [data-theme="dark"] .btn-download {
+      color: #111;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      text-decoration: none;
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: border-color 0.15s, color 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      margin-top: auto;
+      padding: 24px 0;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* ---- Arabic layout ---- */
     [data-lang="ar"] .hero-sub,
-    [data-lang="ar"] .sub,
-    [data-lang="ar"] .status,
-    [data-lang="ar"] .credit-box {
+    [data-lang="ar"] .recommend-card,
+    [data-lang="ar"] .section-label {
       text-align: right;
     }
 
-    [data-lang="ar"] .variant-card,
-    [data-lang="ar"] .recommend-card {
-      text-align: right;
+    [data-lang="ar"] .hero {
+      text-align: center;
     }
 
-    [data-lang="ar"] .release-head {
-      direction: ltr;
-    }
+    /* ---- Responsive ---- */
+    @media (max-width: 600px) {
+      .hero { padding: 32px 0 28px; }
 
-    @media (max-width: 760px) {
-      .container {
-        padding: 12px 10px 38px;
+      .profile-group { gap: 6px; }
+
+      .profile-btn {
+        padding: 7px 12px;
+        font-size: 0.82rem;
       }
 
-      .hero {
-        padding: 22px 14px 16px;
-      }
-
-      .panel {
-        padding: 13px 11px;
-      }
-
-      .btn {
-        width: 100%;
-      }
-
-      .cta-row {
-        display: grid;
-        grid-template-columns: 1fr;
-      }
-
-      .recommend-head {
+      .download-row {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
       }
 
-      .recommend-link {
+      .btn-download, .btn-secondary {
+        justify-content: center;
         width: 100%;
       }
     }
   </style>
 </head>
 <body data-lang="en">
-  <main class="container">
-    <div class="topbar">
-      <div class="brand">EPUB Quran Editions</div>
-      <div class="lang-toggle" role="group" aria-label="Language selector">
-        <button id="langEn" class="lang-btn" type="button" aria-pressed="true">EN</button>
-        <button id="langAr" class="lang-btn" type="button" aria-pressed="false">AR</button>
+  <header>
+    <div class="container">
+      <div class="topbar">
+        <div class="brand">EPUB Quran</div>
+        <div class="topbar-actions">
+          <div class="toggle-group" role="group" aria-label="Language">
+            <button id="langEn" class="toggle-btn" type="button" aria-pressed="true">EN</button>
+            <button id="langAr" class="toggle-btn" type="button" aria-pressed="false">AR</button>
+          </div>
+          <button id="themeToggle" class="theme-btn" type="button" aria-label="Toggle theme">
+            <span class="icon-sun">&#9788;</span>
+            <span class="icon-moon">&#9790;</span>
+          </button>
+        </div>
       </div>
     </div>
+  </header>
 
-    <section class="hero">
-      <div class="hero-main">
-        <div class="arabic-calligraphy" data-i18n="calligraphy">القرآن الكريم</div>
+  <main>
+    <div class="container">
+      <section class="hero">
+        <div class="calligraphy" data-i18n="calligraphy">القرآن الكريم</div>
         <h1 data-i18n="heroTitle">Download Quran EPUB Editions</h1>
-        <p class="hero-sub" data-i18n="heroSub">
-          A cleaner Quran EPUB experience with focused variants. Choose your reader profile and download the right file in one step.
-        </p>
-        <div class="hero-kpis">
-          <div class="kpi"><strong>4</strong><span data-i18n="kpiVariants">Variants</span></div>
-          <div class="kpi"><strong>RTL</strong><span data-i18n="kpiReady">Ready</span></div>
-          <div class="kpi"><strong>Kindle + Android</strong><span data-i18n="kpiSupport">Support</span></div>
-        </div>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="#smartAssistant" data-i18n="heroStart">Start Smart Download</a>
-          <a class="btn" href="https://github.com/usamasq/EPUB-Quran/releases" target="_blank" rel="noopener" data-i18n="openReleases">Open Releases</a>
-          <a class="btn" href="https://github.com/usamasq/EPUB-Quran" target="_blank" rel="noopener" data-i18n="viewRepo">View Repository</a>
-        </div>
-      </div>
-    </section>
+        <p class="hero-sub" data-i18n="heroSub">Choose your reading device and download the right Quran EPUB in one step.</p>
+      </section>
 
-    <section class="panel" id="smartAssistant">
-      <h2 data-i18n="smartTitle">Smart Download Assistant</h2>
-      <p class="sub" data-i18n="smartSub">Select your reader profile and get one recommended file instantly.</p>
-      <div class="profile-group" id="profileGroup">
-        <button class="profile-btn active" type="button" data-profile="kindle_modern" data-i18n="profileKindleModern">Kindle (Modern)</button>
-        <button class="profile-btn" type="button" data-profile="kindle_old" data-i18n="profileKindleOld">Kindle (Older)</button>
-        <button class="profile-btn" type="button" data-profile="android" data-i18n="profileAndroid">Android EPUB Readers</button>
-        <button class="profile-btn" type="button" data-profile="strict" data-i18n="profileStrict">Strict Compatibility</button>
-      </div>
-      <div class="recommend-card">
-        <div class="recommend-head">
-          <div>
-            <div class="recommend-label" data-i18n="recommendedForYou">Recommended for you</div>
-            <h3 id="recommendedFile">Holy_Quran_full.epub</h3>
-            <p id="recommendedReason" class="sub sub-tight">Best balance for modern Kindle firmware and stable EPUB engines.</p>
+      <section class="download-section">
+        <div class="section-label" data-i18n="sectionDevice">Your reading device</div>
+        <div class="profile-group" id="profileGroup">
+          <button class="profile-btn active" type="button" data-profile="kindle_modern" data-i18n="profileKindleModern">Kindle (Modern)</button>
+          <button class="profile-btn" type="button" data-profile="kindle_old" data-i18n="profileKindleOld">Kindle (Older)</button>
+          <button class="profile-btn" type="button" data-profile="android" data-i18n="profileAndroid">Android</button>
+          <button class="profile-btn" type="button" data-profile="strict" data-i18n="profileStrict">Other / Compatibility</button>
+        </div>
+
+        <div class="recommend-card">
+          <div class="recommend-label" data-i18n="recommendedForYou">Recommended for you</div>
+          <h3 id="recommendedFile">Holy_Quran_full.epub</h3>
+          <p id="recommendedReason" class="recommend-reason">Best balance for modern Kindle firmware and stable EPUB engines.</p>
+          <div class="download-row">
+            <a id="recommendedLink" class="btn-download" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub" target="_blank" rel="noopener">
+              <span data-i18n="downloadNow">Download</span>
+            </a>
+            <a class="btn-secondary" href="https://github.com/usamasq/EPUB-Quran/releases" target="_blank" rel="noopener" data-i18n="allReleases">All Releases</a>
           </div>
-          <a id="recommendedLink" class="btn btn-primary recommend-link" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub" target="_blank" rel="noopener">
-            <span data-i18n="downloadNow">Download Now</span>
-          </a>
         </div>
-        <p id="recommendedSummary" class="status">Enhanced typography with no surah chunking.</p>
-      </div>
-      <p class="status" data-i18n="quickNote">Need a specific tag? Use the release list below.</p>
-    </section>
-
-    <section class="panel">
-      <h2 data-i18n="variantsTitle">Variants At A Glance</h2>
-      <p class="sub" data-i18n="variantsSub">Same Quran content, different rendering behavior for different devices.</p>
-      <div class="variant-grid">
-        <article class="variant-card">
-          <h3>Holy_Quran_full.epub</h3>
-          <p data-i18n="variantFullSummary">Enhanced typography with no surah chunking. Best default for modern Kindle.</p>
-        </article>
-        <article class="variant-card">
-          <h3>Holy_Quran_full_compat.epub</h3>
-          <p data-i18n="variantFullCompatSummary">Compatibility CSS and split long surahs for older EPUB engines.</p>
-        </article>
-        <article class="variant-card">
-          <h3>Holy_Quran_lite.epub</h3>
-          <p data-i18n="variantLiteSummary">Lighter rendering profile with chunking for smoother flow on low-memory devices.</p>
-        </article>
-        <article class="variant-card">
-          <h3>Holy_Quran_lite_compat.epub</h3>
-          <p data-i18n="variantLiteCompatSummary">Most conservative compatibility profile for strict or unstable readers.</p>
-        </article>
-      </div>
-      <div class="credit-box" data-i18n="creditBox">
-        Compiled by Usama Bin Shahid. Quran text source: Tarteel QUL. Mapping references: AlQuran.cloud.
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2 data-i18n="releaseTitle">Release Assets By Tag</h2>
-      <p class="sub" data-i18n="releaseSub">Each card is a tag release with downloadable files.</p>
-      <div id="releaseGrid" class="release-grid"></div>
-      <p id="releaseStatus" class="status" data-i18n="loadingReleases">Loading releases...</p>
-    </section>
+      </section>
+    </div>
   </main>
 
+  <footer>
+    <div class="container">
+      <span data-i18n="footerCredit">Compiled by Usama Bin Shahid</span> &middot;
+      <a href="https://qul.tarteel.ai/" target="_blank" rel="noopener">Tarteel QUL</a> &middot;
+      <a href="https://github.com/usamasq/EPUB-Quran" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
   <script>
-    const OWNER = "usamasq";
-    const REPO = "EPUB-Quran";
-    const releaseGrid = document.getElementById("releaseGrid");
-    const releaseStatus = document.getElementById("releaseStatus");
     const langEn = document.getElementById("langEn");
     const langAr = document.getElementById("langAr");
+    const themeToggle = document.getElementById("themeToggle");
     const profileButtons = Array.from(document.querySelectorAll(".profile-btn"));
     const recommendedFile = document.getElementById("recommendedFile");
     const recommendedReason = document.getElementById("recommendedReason");
-    const recommendedSummary = document.getElementById("recommendedSummary");
     const recommendedLink = document.getElementById("recommendedLink");
 
     const variants = {
       full: {
         file: "Holy_Quran_full.epub",
-        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub",
-        summaryKey: "variantFullSummary"
+        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub"
       },
       full_compat: {
         file: "Holy_Quran_full_compat.epub",
-        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full_compat.epub",
-        summaryKey: "variantFullCompatSummary"
+        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full_compat.epub"
       },
       lite: {
         file: "Holy_Quran_lite.epub",
-        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite.epub",
-        summaryKey: "variantLiteSummary"
+        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite.epub"
       },
       lite_compat: {
         file: "Holy_Quran_lite_compat.epub",
-        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite_compat.epub",
-        summaryKey: "variantLiteCompatSummary"
+        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite_compat.epub"
       }
     };
 
     const profiles = {
-      kindle_modern: { variant: "full", reasonKey: "profileKindleModernReason" },
-      kindle_old: { variant: "full_compat", reasonKey: "profileKindleOldReason" },
-      android: { variant: "lite", reasonKey: "profileAndroidReason" },
-      strict: { variant: "lite_compat", reasonKey: "profileStrictReason" }
+      kindle_modern: { variant: "full", reasonKey: "reasonKindleModern" },
+      kindle_old: { variant: "full_compat", reasonKey: "reasonKindleOld" },
+      android: { variant: "lite", reasonKey: "reasonAndroid" },
+      strict: { variant: "lite_compat", reasonKey: "reasonStrict" }
     };
 
     let currentProfile = "kindle_modern";
+    let currentLang = "en";
 
     const i18n = {
       en: {
         calligraphy: "القرآن الكريم",
         heroTitle: "Download Quran EPUB Editions",
-        heroSub: "A cleaner Quran EPUB experience with focused variants. Choose your reader profile and download the right file in one step.",
-        heroStart: "Start Smart Download",
-        openReleases: "Open Releases",
-        viewRepo: "View Repository",
-        kpiVariants: "Variants",
-        kpiReady: "RTL Ready",
-        kpiSupport: "Devices",
-        smartTitle: "Smart Download Assistant",
-        smartSub: "Select your reading setup and get one recommended file.",
+        heroSub: "Choose your reading device and download the right Quran EPUB in one step.",
+        sectionDevice: "Your reading device",
         profileKindleModern: "Kindle (Modern)",
         profileKindleOld: "Kindle (Older)",
-        profileAndroid: "Android EPUB Readers",
-        profileStrict: "Strict Compatibility",
-        profileKindleModernReason: "Best balance for modern Kindle firmware and stable EPUB engines.",
-        profileKindleOldReason: "Safer rendering path for older Kindle firmware and weaker engines.",
-        profileAndroidReason: "Lighter flow for Android readers and lower-memory devices.",
-        profileStrictReason: "Most conservative profile when layout glitches appear on your reader.",
+        profileAndroid: "Android",
+        profileStrict: "Other / Compatibility",
         recommendedForYou: "Recommended for you",
-        downloadNow: "Download Now",
-        download: "Download",
-        checksums: "Checksums",
-        quickNote: "Need a specific tag? Use the release list below.",
-        variantsTitle: "Variants At A Glance",
-        variantsSub: "Same Quran content, different rendering behavior for different devices.",
-        variantFullSummary: "Enhanced typography with no surah chunking. Best default for modern Kindle.",
-        variantFullCompatSummary: "Compatibility CSS and split long surahs for older EPUB engines.",
-        variantLiteSummary: "Lighter rendering profile with chunking for smoother flow on low-memory devices.",
-        variantLiteCompatSummary: "Most conservative compatibility profile for strict or unstable readers.",
-        releaseTitle: "Release Assets By Tag",
-        releaseSub: "Each card is a tag release with downloadable files.",
-        loadingReleases: "Loading releases...",
-        noReleases: "No published releases found yet.",
-        noAssets: "Releases found, but no EPUB assets detected.",
-        showCount: (n) => `Showing ${n} release tag(s).`,
-        fetchError: "Could not load release assets automatically. Use GitHub Releases directly.",
-        creditBox: "Compiled by Usama Bin Shahid. Quran text source: Tarteel QUL. Mapping references: AlQuran.cloud."
+        downloadNow: "Download",
+        allReleases: "All Releases",
+        reasonKindleModern: "Enhanced typography, optimized for modern Kindle firmware.",
+        reasonKindleOld: "Compatibility styling with split long surahs for older Kindle devices.",
+        reasonAndroid: "Lighter rendering with chunking for smooth scrolling on Android readers.",
+        reasonStrict: "Most conservative profile for maximum compatibility across all readers.",
+        footerCredit: "Compiled by Usama Bin Shahid"
       },
       ar: {
         calligraphy: "القرآن الكريم",
         heroTitle: "تحميل نسخ القرآن بصيغة EPUB",
-        heroSub: "تجربة تحميل أوضح للقرآن بصيغة EPUB. اختر نوع جهازك لتحصل على النسخة المناسبة مباشرة.",
-        heroStart: "ابدأ التوصية الذكية",
-        openReleases: "فتح صفحة الإصدارات",
-        viewRepo: "عرض المستودع",
-        kpiVariants: "نسخ",
-        kpiReady: "جاهز RTL",
-        kpiSupport: "أجهزة",
-        smartTitle: "مساعد التنزيل الذكي",
-        smartSub: "اختر بيئة القراءة لديك لتحصل على توصية مباشرة بملف واحد.",
+        heroSub: "اختر جهاز القراءة الخاص بك وحمّل النسخة المناسبة مباشرة.",
+        sectionDevice: "جهاز القراءة الخاص بك",
         profileKindleModern: "Kindle (حديث)",
         profileKindleOld: "Kindle (قديم)",
-        profileAndroid: "قارئات EPUB على أندرويد",
-        profileStrict: "توافق صارم",
-        profileKindleModernReason: "أفضل توازن لأجهزة Kindle الحديثة ومحركات EPUB المستقرة.",
-        profileKindleOldReason: "مسار عرض أكثر أمانًا للأجهزة القديمة والمحركات الأضعف.",
-        profileAndroidReason: "تدفق أخف لقارئات أندرويد والأجهزة محدودة الذاكرة.",
-        profileStrictReason: "الخيار الأكثر محافظة عند ظهور مشاكل عرض في برنامج القراءة.",
-        recommendedForYou: "التوصية المناسبة لك",
-        downloadNow: "تنزيل الآن",
-        download: "تنزيل",
-        checksums: "بصمات التحقق",
-        quickNote: "تحتاج وسم إصدار محدد؟ استخدم قائمة الإصدارات بالأسفل.",
-        variantsTitle: "النسخ بشكل مختصر",
-        variantsSub: "المحتوى القرآني نفسه، مع اختلافات مخصصة لسلوك برامج القراءة.",
-        variantFullSummary: "تنسيق محسّن بدون تقسيم طويل للسور. الخيار الافتراضي الأفضل للأجهزة الحديثة.",
-        variantFullCompatSummary: "تنسيق توافق مع تقسيم السور الطويلة لمحركات EPUB الأقدم.",
-        variantLiteSummary: "نسخة أخف مع تقسيم السور لتدفق أسرع على الأجهزة الضعيفة.",
-        variantLiteCompatSummary: "أكثر ملف محافظ للتوافق عندما تكون محركات العرض غير مستقرة.",
-        releaseTitle: "ملفات كل وسم إصدار",
-        releaseSub: "كل بطاقة تمثل وسم إصدار يحتوي ملفات جاهزة للتنزيل.",
-        loadingReleases: "جارٍ تحميل الإصدارات...",
-        noReleases: "لا توجد إصدارات منشورة حتى الآن.",
-        noAssets: "تم العثور على إصدارات لكن لم يتم العثور على ملفات EPUB.",
-        showCount: (n) => `يتم عرض ${n} وسم إصدار.`,
-        fetchError: "تعذر تحميل ملفات الإصدارات تلقائيًا. استخدم صفحة GitHub Releases مباشرة.",
-        creditBox: "إعداد وتجميع: أسامة بن شهيد. مصدر النص: ترتيل QUL. مراجع الخرائط: AlQuran.cloud."
+        profileAndroid: "أندرويد",
+        profileStrict: "أخرى / توافق",
+        recommendedForYou: "الموصى به لك",
+        downloadNow: "تنزيل",
+        allReleases: "جميع الإصدارات",
+        reasonKindleModern: "تنسيق محسّن لأجهزة Kindle الحديثة.",
+        reasonKindleOld: "تنسيق توافق مع تقسيم السور الطويلة لأجهزة Kindle القديمة.",
+        reasonAndroid: "نسخة أخف مع تقسيم السور لتدفق أسرع على قارئات أندرويد.",
+        reasonStrict: "الخيار الأكثر توافقًا مع جميع برامج القراءة.",
+        footerCredit: "إعداد وتجميع: أسامة بن شهيد"
       }
     };
 
-    let currentLang = "en";
-
-    function formatDate(iso) {
-      const dt = new Date(iso);
-      return dt.toLocaleDateString(currentLang === "ar" ? "ar-SA" : undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric"
-      });
-    }
-
-    function formatBytes(bytes) {
-      if (!bytes && bytes !== 0) return "";
-      const mb = bytes / (1024 * 1024);
-      return `${mb.toFixed(2)} MB`;
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
-    }
-
     function t(key) {
-      return i18n[currentLang][key];
+      return i18n[currentLang][key] || i18n.en[key] || key;
     }
 
     function updateRecommendation() {
       const profile = profiles[currentProfile];
       const variant = variants[profile.variant];
-
-      profileButtons.forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.profile === currentProfile);
-      });
-
+      profileButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.profile === currentProfile));
       recommendedFile.textContent = variant.file;
       recommendedReason.textContent = t(profile.reasonKey);
-      recommendedSummary.textContent = t(variant.summaryKey);
       recommendedLink.href = variant.url;
     }
 
@@ -781,98 +545,49 @@
       document.documentElement.lang = currentLang === "ar" ? "ar" : "en";
       document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
       document.body.dataset.lang = currentLang;
-
-      document.querySelectorAll("[data-i18n]").forEach((el) => {
+      document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
-        if (t(key)) {
-          el.textContent = t(key);
-        }
+        const val = t(key);
+        if (val) el.textContent = val;
       });
-
       langEn.setAttribute("aria-pressed", currentLang === "en" ? "true" : "false");
       langAr.setAttribute("aria-pressed", currentLang === "ar" ? "true" : "false");
       updateRecommendation();
     }
 
-    function releaseCard(release) {
-      const assets = (release.assets || []).filter((a) => a.name.toLowerCase().endsWith(".epub") || a.name === "SHA256SUMS.txt");
-      if (!assets.length) return "";
-
-      const epubAssets = assets.filter((a) => a.name.toLowerCase().endsWith(".epub"));
-      const checksumAsset = assets.find((a) => a.name === "SHA256SUMS.txt");
-      const links = epubAssets.map((asset) => `
-        <a class="asset-link" href="${asset.browser_download_url}" target="_blank" rel="noopener">
-          <span>${escapeHtml(asset.name)}</span>
-          <span class="asset-size">${formatBytes(asset.size)}</span>
-        </a>
-      `).join("");
-
-      const checksumLink = checksumAsset
-        ? `<a class="asset-link" href="${checksumAsset.browser_download_url}" target="_blank" rel="noopener"><span>SHA256SUMS.txt</span><span class="asset-size">${t("checksums")}</span></a>`
-        : "";
-
-      return `
-        <article class="release-card">
-          <div class="release-head">
-            <span class="release-tag">${escapeHtml(release.tag_name)}</span>
-            <span class="release-date">${formatDate(release.published_at || release.created_at)}</span>
-          </div>
-          <div class="asset-list">
-            ${links}
-            ${checksumLink}
-          </div>
-        </article>
-      `;
+    // Theme
+    function setTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      document.getElementById("themeColorMeta").content = theme === "dark" ? "#1a1d1e" : "#faf9f6";
+      localStorage.setItem("theme", theme);
     }
 
-    async function loadReleases() {
-      try {
-        const url = `https://api.github.com/repos/${OWNER}/${REPO}/releases?per_page=15`;
-        const res = await fetch(url, { headers: { Accept: "application/vnd.github+json" } });
-        if (!res.ok) throw new Error(`GitHub API responded ${res.status}`);
-
-        const releases = await res.json();
-        const usable = releases.filter((r) => !r.draft && !r.prerelease);
-
-        if (!usable.length) {
-          releaseStatus.textContent = t("noReleases");
-          return;
-        }
-
-        const html = usable.map(releaseCard).filter(Boolean).join("");
-        if (!html) {
-          releaseStatus.textContent = t("noAssets");
-          return;
-        }
-
-        releaseGrid.innerHTML = html;
-        releaseStatus.textContent = t("showCount")(usable.length);
-      } catch (err) {
-        releaseStatus.innerHTML = `<span class="error">${t("fetchError")}</span>`;
+    function initTheme() {
+      const saved = localStorage.getItem("theme");
+      if (saved) {
+        setTheme(saved);
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        setTheme("dark");
       }
     }
 
-    langEn.addEventListener("click", () => {
-      currentLang = "en";
-      applyTranslations();
-      loadReleases();
+    themeToggle.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      setTheme(current === "dark" ? "light" : "dark");
     });
 
-    langAr.addEventListener("click", () => {
-      currentLang = "ar";
-      applyTranslations();
-      loadReleases();
-    });
+    langEn.addEventListener("click", () => { currentLang = "en"; applyTranslations(); });
+    langAr.addEventListener("click", () => { currentLang = "ar"; applyTranslations(); });
 
-    profileButtons.forEach((btn) => {
+    profileButtons.forEach(btn => {
       btn.addEventListener("click", () => {
         currentProfile = btn.dataset.profile;
         updateRecommendation();
       });
     });
 
+    initTheme();
     applyTranslations();
-    loadReleases();
   </script>
 </body>
 </html>
