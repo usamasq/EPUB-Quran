@@ -243,8 +243,8 @@ def plan_surah_sections(structured, split_threshold):
 def build_css(target):
     # Bumped sizes significantly: Arabic script naturally renders smaller visually than Latin.
     # 2.4em/2.3em should give it parity with standard English book text on a Kindle.
-    quran_font_size = "2.4em" if target.variant == "full" else "2.3em"
-    quran_line_height = "2.5" if target.variant == "full" else "2.3"
+    quran_font_size = "2.2em" if target.variant == "full" else "2.1em"
+    quran_line_height = "2.2" if target.variant == "full" else "2.0"
     body_margin = "3% 5%" if target.variant == "full" else "2.8% 4.2%"
     body_text = "#000000"
     bg_color = "#fdfcf8"
