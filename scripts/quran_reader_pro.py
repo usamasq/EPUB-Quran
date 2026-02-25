@@ -13,12 +13,13 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 
 INPUT_JSON = os.path.join(PROJECT_ROOT, "data", "indopak.json")
 RUKU_MAP_JSON = os.path.join(PROJECT_ROOT, "data", "ruku_starts.json")
+TAFSIR_JSON = os.path.join(PROJECT_ROOT, "abridged-explanation-of-the-quran.json")
 COVER_PATH = os.path.join(PROJECT_ROOT, "assets", "cover.png")
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, "releases")
 PROJECT_REPO_URL = "https://github.com/usamasq/EPUB-Quran"
 PROJECT_RELEASES_URL = "https://github.com/usamasq/EPUB-Quran/releases"
 PROJECT_SITE_URL = "https://usamasq.github.io/EPUB-Quran/"
-PROJECT_CONTACT_URL = "https://www.linkedin.com/in/usamasq/"
+PROJECT_CONTACT_URL = "mailto:usamasq@gmail.com"
 
 # =========================
 # EPUB METADATA CONFIGURATION
@@ -49,43 +50,21 @@ class BuildTarget:
     show_juz: bool = True
     show_ruku: bool = True
     show_sajdah: bool = True
+    show_tafsir: bool = True
 
 
 BUILD_TARGETS = {
-    "full": BuildTarget(
-        key="full",
-        label="Full Edition (Enhanced)",
-        output_name="Holy_Quran_full.epub",
-        profile="enhanced",
-        variant="full",
-        split_threshold=0,
-    ),
-    "full_compat": BuildTarget(
-        key="full_compat",
-        label="Full Edition (Compatibility)",
-        output_name="Holy_Quran_full_compat.epub",
-        profile="compat",
-        variant="full",
-        split_threshold=110,
-    ),
-    "lite": BuildTarget(
-        key="lite",
-        label="Lite Edition (Enhanced)",
-        output_name="Holy_Quran_lite.epub",
-        profile="enhanced",
-        variant="lite",
-        split_threshold=90,
-    ),
-    "lite_compat": BuildTarget(
-        key="lite_compat",
-        label="Lite Edition (Compatibility)",
-        output_name="Holy_Quran_lite_compat.epub",
+    "main": BuildTarget(
+        key="main",
+        label="Universal Edition",
+        output_name="Holy Quran.epub",
         profile="compat",
         variant="lite",
         split_threshold=70,
+        show_tafsir=True,
     ),
 }
-DEFAULT_TARGET_KEYS = ["full", "full_compat", "lite", "lite_compat"]
+DEFAULT_TARGET_KEYS = ["main"]
 
 
 # =========================
@@ -152,13 +131,37 @@ def load_data():
         a = int(item["ayah"])
         structured[s][a].append(item["text"])
 
-    return structured
+    try:
+        with open(TAFSIR_JSON, encoding="utf-8") as f:
+            tafsir_raw = json.load(f)
+    except FileNotFoundError:
+        tafsir_raw = {}
+        print(f"Warning: {TAFSIR_JSON} not found.")
+        
+    tafsir = {}
+    redirects = {}
+    for key, value in tafsir_raw.items():
+        parts = key.split(":")
+        if len(parts) == 2:
+            s, a = map(int, parts)
+            if isinstance(value, dict) and "text" in value:
+                tafsir[(s, a)] = value["text"]
+            elif isinstance(value, str):
+                redirects[(s, a)] = value
+
+    for (s, a), redirect_val in redirects.items():
+        parts = redirect_val.split(":")
+        if len(parts) == 2:
+            ts, ta = map(int, parts)
+            tafsir[(s, a)] = tafsir.get((ts, ta), "Explanation available in another verse.")
+
+    return structured, tafsir
 
 
 # =========================
 # QURAN MAPS
 # =========================
-from quran_maps import SURAH_NAMES, JUZ_LOOKUP, SAJDAH_VERSES
+from quran_maps import SURAH_NAMES, JUZ_LOOKUP, SAJDAH_VERSES, JUZ_NAMES
 
 RUKU_MAP = load_json_map(RUKU_MAP_JSON)
 
@@ -238,10 +241,12 @@ def plan_surah_sections(structured, split_threshold):
 # RENDERING
 # =========================
 def build_css(target):
-    quran_font_size = "1.56em" if target.variant == "full" else "1.48em"
-    quran_line_height = "3.0" if target.variant == "full" else "2.8"
+    # Bumped sizes significantly: Arabic script naturally renders smaller visually than Latin.
+    # 2.4em/2.3em should give it parity with standard English book text on a Kindle.
+    quran_font_size = "2.4em" if target.variant == "full" else "2.3em"
+    quran_line_height = "2.5" if target.variant == "full" else "2.3"
     body_margin = "3% 5%" if target.variant == "full" else "2.8% 4.2%"
-    body_text = "#111111"
+    body_text = "#000000"
     bg_color = "#fdfcf8"
     card_bg = "#ffffff"
     accent = "#174d35"
@@ -265,7 +270,6 @@ body {{
     font-family: serif;
     margin: {body_margin};
     color: {body_text};
-    background-color: {bg_color};
     -webkit-hyphens: none;
     hyphens: none;
 }}
@@ -281,12 +285,25 @@ h1 {{
     font-size: 2.12em;
 }}
 
+h1.surah-header {{
+    text-align: center;
+    color: {accent};
+    margin: 1.5em 0 1em;
+    font-size: 2.2em;
+    border-top: 4px double {accent};
+    border-bottom: 4px double {accent};
+    padding: 0.4em 0 0.2em;
+    background-color: rgba(23, 77, 53, 0.05);
+    line-height: 1.4;
+}}
+
 .bismillah {{
     text-align: center;
-    font-size: 1.75em;
-    margin-bottom: 1.3em;
-    color: #0f3425;
+    font-size: 1.85em;
+    margin-bottom: 1.2em;
+    color: #111111;
     line-height: 2;
+    font-weight: bold;
 }}
 
 .juz-marker {{
@@ -334,7 +351,9 @@ h1 {{
 .ayah-end {{
     white-space: nowrap;
     margin-right: 0.2em;
-    font-size: 0.98em;
+    font-size: 0.9em;
+    color: {accent};
+    font-weight: normal;
 }}
 
 .ayah-anchor {{
@@ -342,7 +361,8 @@ h1 {{
 }}
 
 .quran-text {{
-    text-align: right;
+    text-align: justify;
+    text-justify: inter-word;
     line-height: {quran_line_height};
     font-size: {quran_font_size};
     word-spacing: 0em;
@@ -410,7 +430,6 @@ h1 {{
 }}
 
 .signature {{
-    background: #eef4f1;
     border: 1px solid #d5e3dc;
     border-left: 4px solid {accent};
     border-radius: 10px;
@@ -427,7 +446,6 @@ h1 {{
 }}
 
 .credit-card {{
-    background: {card_bg};
     border: 1px solid #d9e2dd;
     border-radius: 12px;
     padding: 0.95em 1em;
@@ -468,10 +486,15 @@ h1 {{
 @media (prefers-color-scheme: dark) {{
     body {{
         color: #e8efec;
-        background-color: #0f1714;
     }}
     h1, .main-title {{
         color: #90c8ae;
+    }}
+    h1.surah-header {{
+        color: #90c8ae;
+        border-top-color: #3b6251;
+        border-bottom-color: #3b6251;
+        background-color: rgba(65, 122, 98, 0.08);
     }}
     .bismillah {{
         color: #c7e8d9;
@@ -491,28 +514,128 @@ h1 {{
         border-bottom-color: #274136;
     }}
     .signature {{
-        background: #13201b;
+        background: transparent;
         border-color: #2a4338;
     }}
     .credit-card {{
-        background: #131d19;
+        background: transparent;
         border-color: #2a3f36;
     }}
     .build-meta {{
         border-top-color: #264238;
         color: #a6b9b2;
     }}
+    rt {{
+        color: #8fa49a;
+    }}
+    .tafsir-container {{
+        background: transparent;
+        border-color: #2d4b3f;
+    }}
+    .tafsir-text {{
+        color: #d1dfd9;
+    }}
+}}
+
+/* WBW Grammar Colors */
+.p {{ color: #d35400; }} /* Preposition */
+.v {{ color: #27ae60; }} /* Verb */
+.n {{ color: #2980b9; }} /* Noun */
+.pn {{ color: #8e44ad; }} /* Proper Noun */
+.pro {{ color: #c0392b; }} /* Pronoun */
+.adj {{ color: #16a085; }} /* Adjective */
+.dem {{ color: #f39c12; }} /* Demonstrative */
+.rel {{ color: #d35400; }} /* Relative Pronoun */
+.neg {{ color: #e74c3c; }} /* Negative Particle */
+.con {{ color: #bdc3c7; }} /* Conjunction */
+.cond {{ color: #7f8c8d; }} /* Conditional Particle */
+.inc {{ color: #95a5a6; }} /* Inceptive Particle */
+.acc {{ color: #34495e; }} /* Accusative Particle */
+.amd {{ color: #2c3e50; }} /* Amendment Particle */
+.ans {{ color: #e67e22; }} /* Answer Particle */
+.av {{ color: #2ecc71; }} /* Imperative Verbal Noun */
+.caus {{ color: #f1c40f; }} /* Particle of Cause */
+.cert {{ color: #1abc9c; }} /* Particle of Certainty */
+.circ {{ color: #3498db; }} /* Circumstantial Particle */
+.com {{ color: #9b59b6; }} /* Comitative Particle */
+.def {{ color: #1abc9c; }} /* Prefix Particle */
+.emph {{ color: #c0392b; }} /* Emphatic Prefix */
+.eq {{ color: #e74c3c; }} /* Equalization Particle */
+.exh {{ color: #e67e22; }} /* Exhortation Particle */
+.exp {{ color: #f1c40f; }} /* Exceptive Particle */
+.fut {{ color: #2ecc71; }} /* Future Particle */
+.in {{ color: #3498db; }} /* Initials */
+.int {{ color: #9b59b6; }} /* Interrogative Particle */
+.intg {{ color: #34495e; }} /* Interrogative Prefix */
+.loc {{ color: #16a085; }} /* Location Noun */
+.ndem {{ color: #f39c12; }} /* Demonstrative Pronoun Prefix */
+.pcl {{ color: #d35400; }} /* Particle */
+.prp {{ color: #e74c3c; }} /* Purpose Particle */
+.res {{ color: #7f8c8d; }} /* Restriction Particle */
+.ret {{ color: #bdc3c7; }} /* Retraction Particle */
+.rslt {{ color: #95a5a6; }} /* Result Particle */
+.sup {{ color: #2c3e50; }} /* Supplemental Particle */
+.sur {{ color: #e67e22; }} /* Surprise Particle */
+.t {{ color: #f1c40f; }} /* Time Noun */
+.voc {{ color: #e74c3c; }} /* Vocative Particle */
+
+/* Tafsir Link styling */
+.tafsir-ayah-link {{
+    text-decoration: none;
+    color: inherit;
+    font-weight: bold;
+    color: {accent};
+}}
+
+/* Tafsir Appendix styling */
+.tafsir-container {{
+    border: 1px solid #e0eae5;
+    border-radius: 8px;
+    padding: 1.4em 1.2em;
+    margin-bottom: 1.8em;
+    text-align: left;
+    background-color: #fdfcf8;
+    box-shadow: 0 1px 3px rgba(23, 77, 53, 0.05);
+}}
+
+.tafsir-header {{
+    font-weight: bold;
+    color: {accent};
+    margin-bottom: 0.8em;
+    font-size: 1.15em;
+    border-bottom: 2px solid #e0eae5;
+    padding-bottom: 0.4em;
+}}
+
+.tafsir-backlink {{
+    float: right;
+    font-size: 0.85em;
+    color: {accent_soft};
+    text-decoration: none;
+    border: 1px solid #d3ddd8;
+    padding: 0.2em 0.6em;
+    border-radius: 4px;
+    background: #ffffff;
+}}
+
+.tafsir-text {{
+    font-family: serif;
+    font-size: 1.1em;
+    line-height: 1.75;
+    color: #111111;
+    text-align: justify;
+    text-justify: inter-word;
 }}
 """
 
 
 def build_title_html(target):
-    return f"""<html>
+    return f"""<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" dir="rtl" lang="ar">
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Title Page</title></head>
-<body><div class="main-wrapper">
+<body epub:type="frontmatter" dir="rtl"><div class="main-wrapper" dir="rtl">
     <div class="title-page">
         <div class="ornament">﴾ ❖ ﴿</div>
-        <h1 class="main-title">{BOOK_TITLE}</h1>
+        <h1 class="main-title" epub:type="title">{BOOK_TITLE}</h1>
         <div class="ornament">﴾ ❖ ﴿</div>
     </div>
 </div></body></html>"""
@@ -520,78 +643,52 @@ def build_title_html(target):
 
 def build_credits_html(target):
     built_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    other_variants = ", ".join(bt.output_name for key, bt in BUILD_TARGETS.items() if key != target.key)
-    return f"""<html>
+    return f"""<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>Publication Information</title></head>
-<body><div class="main-wrapper" dir="ltr">
+<body epub:type="frontmatter"><div class="main-wrapper" dir="ltr">
     <div class="credits-page">
         <div class="credits-header">
             <div class="credits-title">Publication Information</div>
-            <div class="credits-sub">Edition details, source references, and support/contact links for this EPUB.</div>
-        </div>
-        <div class="signature">
-            For feedback, complaints, or suggestions about this EPUB edition, please contact
-            <strong>Usama Bin Shahid</strong> via
-            <a href="{PROJECT_CONTACT_URL}">LinkedIn</a> or
-            <a href="{PROJECT_REPO_URL}/issues">GitHub Issues</a>.
+            <div class="credits-sub">Details regarding this digital edition of the Holy Quran.</div>
         </div>
         <div class="credit-grid">
             <div class="credit-card">
-                <h3>This Variant</h3>
-                {target.output_name} ({target.label})
+                <h3>Translation & Tafsir Source</h3>
+                The Arabic text, Tafsir (Explanation), and Word-By-Word grammatical data were provided by 
+                <a href="https://qul.tarteel.ai/">Tarteel QUL</a>. We are deeply grateful for their robust open-source contributions to Islamic knowledge.
             </div>
             <div class="credit-card">
-                <h3>Other Available Variants</h3>
-                {other_variants}<br/>
-                Download all variants from <a href="{PROJECT_RELEASES_URL}">GitHub Releases</a>.
+                <h3>Open Source Project</h3>
+                <strong>Repository:</strong> <a href="{PROJECT_REPO_URL}">{PROJECT_REPO_URL}</a><br/>
+                Compiled and formatted with care by <strong>Usama Bin Shahid</strong>. For any feedback, corrections, or suggestions, please reach out via <a href="{PROJECT_CONTACT_URL}">Email</a> (usamasq@gmail.com).
             </div>
             <div class="credit-card">
-                <h3>Project Links</h3>
-                Repository: <a href="{PROJECT_REPO_URL}">{PROJECT_REPO_URL}</a><br/>
-                Releases: <a href="{PROJECT_RELEASES_URL}">{PROJECT_RELEASES_URL}</a><br/>
-                Static page: <a href="{PROJECT_SITE_URL}">{PROJECT_SITE_URL}</a>
-            </div>
-            <div class="credit-card">
-                <h3>Quran Text Source</h3>
-                The authentic Indo-Pak Quranic text used in this publication is sourced from
-                <a href="https://qul.tarteel.ai/">Tarteel QUL</a>.
-            </div>
-            <div class="credit-card">
-                <h3>Structural Mapping</h3>
-                Juz and Ruku boundary mapping support was prepared using reference data from
-                <a href="https://alquran.cloud/">AlQuran.cloud</a>.
-            </div>
-            <div class="credit-card">
-                <h3>Typeface</h3>
-                Arabic text uses each reader's native system serif/Arabic rendering stack,
-                including Kindle's built-in Arabic support on modern firmware.
+                <h3>Acknowledgments</h3>
+                May Allah (SWT) accept this humble effort and make it a source of guidance and benefit for all who read it. We ask for your prayers for the developers, contributors, and their families.
             </div>
         </div>
         <div class="build-meta">
-            Publisher: {BOOK_PUBLISHER}<br/>
+            Target: {target.output_name} ({target.label})<br/>
             Build: {built_at}<br/>
-            License: MIT<br/>
-            Contact: <a href="{PROJECT_CONTACT_URL}">{PROJECT_CONTACT_URL}</a>
+            Publisher: {BOOK_PUBLISHER}
         </div>
     </div>
 </div></body></html>"""
 
 
-def build_surah_section_html(surah_num, ayahs, section, target, ruku_ends, single_ruku_surahs):
+def build_surah_section_html(surah_num, ayahs, section, target, ruku_ends, single_ruku_surahs, tafsir):
     arabic_num = to_arabic_number(surah_num)
     surah_name = SURAH_NAMES.get(surah_num, f"Surah {surah_num}")
     title = f"{arabic_num}. {surah_name}"
     if section["total_parts"] > 1:
         title = f"{title} (Part {section['part_index']}/{section['total_parts']})"
 
-    html = f"""<html>
+    html = f"""<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" dir="rtl" lang="ar">
 <head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>{title}</title></head>
-<body><div class="main-wrapper">"""
+<body epub:type="bodymatter chapter" dir="rtl"><div class="main-wrapper" dir="rtl">"""
 
     if section["is_first"]:
-        html += f"<h1>{arabic_num}. {surah_name}</h1>"
-        if surah_num > 1:
-            html += '<div class="surah-separator">✦ ✦ ✦</div>'
+        html += f'<h1 class="surah-header" epub:type="title">{arabic_num}. {surah_name}</h1>'
         if surah_num not in [1, 9]:
             html += '<div class="bismillah" dir="rtl">بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ</div>'
     else:
@@ -600,36 +697,45 @@ def build_surah_section_html(surah_num, ayahs, section, target, ruku_ends, singl
             f'of {section["total_parts"]}</div>'
         )
 
-    html += '<div class="quran-text">'
+    html += '<div class="quran-text" dir="rtl">'
 
     for ayah_num in section["ayah_numbers"]:
         indicators_html = ""
         if target.show_juz and (surah_num, ayah_num) in JUZ_LOOKUP:
             indicators_html += (
-                f'<div class="juz-marker">'
+                f'<div class="juz-marker" epub:type="pagebreak">'
                 f'الجزء {to_arabic_number(JUZ_LOOKUP[(surah_num, ayah_num)])}'
                 f"</div>"
             )
 
         if indicators_html:
-            html += f'</div>{indicators_html}<div class="quran-text">'
+            html += f'</div>{indicators_html}<div class="quran-text" dir="rtl">'
+
+        # Using Ornate Parentheses ﴿ ﴾ instead of the ARABIC_END_MARK ۝ 
+        # because Kindle's default fonts lack the ligature tables to wrap the circle around Eastern Arabic digits.
+        ayah_mark = f"&#xFD3F;{to_arabic_number(ayah_num)}&#xFD3E;"
+        has_sajdah_symbol = False
+
+        html += f'<span class="ayah-anchor" id="a{surah_num}_{ayah_num}">\u200b</span>'
+
+        ayah_link_start = ""
+        ayah_link_end = ""
+        if target.show_tafsir and tafsir and (surah_num, ayah_num) in tafsir:
+            ayah_link_start = f'<a href="tafsir_surah_{surah_num}.xhtml#t{surah_num}_{ayah_num}" class="tafsir-ayah-link" epub:type="noteref" title="Explanation">'
+            ayah_link_end = '</a>'
 
         text = normalize_ayah_text(" ".join(ayahs[ayah_num]))
         text, has_sajdah_symbol = stylize_special_symbols(text, target)
-        ayah_mark = f"{ARABIC_END_MARK}{to_arabic_number(ayah_num)}"
-
-        if (surah_num, ayah_num) in JUZ_LOOKUP:
-            html += f'<span class="ayah-anchor" id="a{surah_num}_{ayah_num}">\u200b</span>'
-
         html += text
-        html += f' <span class="ayah-end">{ayah_mark}</span>'
+            
+        html += f' <span class="ayah-end">{ayah_link_start}{ayah_mark}{ayah_link_end}</span>'
 
         if (
             target.show_ruku
             and (surah_num, ayah_num) in ruku_ends
             and surah_num not in single_ruku_surahs
         ):
-            html += f' <span class="ruku-marker">ع{to_arabic_number(ruku_ends[(surah_num, ayah_num)])}</span>'
+            html += f' <span class="ruku-marker" epub:type="pagebreak">ع{to_arabic_number(ruku_ends[(surah_num, ayah_num)])}</span>'
 
         if target.show_sajdah and (surah_num, ayah_num) in SAJDAH_VERSES and not has_sajdah_symbol:
             html += '&nbsp;<span class="sajdah">۩</span>'
@@ -638,6 +744,40 @@ def build_surah_section_html(surah_num, ayahs, section, target, ruku_ends, singl
 
     html += "</div></div></body></html>"
     html = html.replace('<div class="quran-text"></div>', "")
+    return html
+
+def build_tafsir_section_html(surah_num, ayahs_list, target, tafsir, ayah_to_file):
+    from quran_maps import SURAH_NAMES
+    arabic_num = to_arabic_number(surah_num)
+    surah_name = SURAH_NAMES.get(surah_num, f"Surah {surah_num}")
+    title = f"Tafsir - {surah_name}"
+    
+    html = f"""<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<head><meta charset="utf-8"/><link rel="stylesheet" href="style.css"/><title>{title}</title></head>
+<body epub:type="bodymatter chapter"><div class="main-wrapper" dir="ltr">"""
+
+    html += f'<h1 epub:type="title" dir="ltr">Explanation (Tafsir) - {surah_name}</h1>'
+
+    has_content = False
+    for ayah_num in sorted(ayahs_list):
+        if (surah_num, ayah_num) in tafsir:
+            has_content = True
+            tafsir_text = tafsir[(surah_num, ayah_num)]
+            target_file = ayah_to_file.get((surah_num, ayah_num), f"surah_{surah_num}.xhtml")
+            ayah_link = f"{target_file}#a{surah_num}_{ayah_num}"
+                
+            html += f"""
+            <div class="tafsir-container" dir="ltr" id="t{surah_num}_{ayah_num}">
+                <div class="tafsir-header">
+                    Ayah {surah_num}:{ayah_num}
+                    <a href="{ayah_link}" class="tafsir-backlink" epub:type="backlink">⏎ Back to Ayah</a>
+                </div>
+                <div class="tafsir-text" epub:type="commentary">{tafsir_text}</div>
+            </div>"""
+
+    html += "</div></body></html>"
+    if not has_content:
+        return None
     return html
 
 
@@ -651,10 +791,17 @@ def build_juz_index(ayah_to_file):
         if j in juz_starts:
             s, a = juz_starts[j]
             surah_name = SURAH_NAMES.get(s, f"Surah {s}")
+            juz_name = JUZ_NAMES.get(j, "")
             target_file = ayah_to_file.get((s, a), f"surah_{s}.xhtml")
+            
+            display_text = f"الجزء {to_arabic_number(j)}"
+            if juz_name:
+                display_text += f" ({juz_name})"
+            display_text += f" — {surah_name}"
+
             html += (
                 f'<div class="index-item"><a class="index-link" href="{target_file}#a{s}_{a}">'
-                f"الجزء {to_arabic_number(j)} — {surah_name}</a></div>"
+                f"{display_text}</a></div>"
             )
 
     html += "</div></div></body></html>"
@@ -681,7 +828,7 @@ def build_surah_index(surah_first_file):
 # =========================
 # EPUB CREATION
 # =========================
-def create_epub(structured, target):
+def create_epub(structured, tafsir, target):
     surah_last_ayah = {s: max(ayahs.keys()) for s, ayahs in structured.items()}
     ruku_ends, single_ruku_surahs = build_ruku_metadata(surah_last_ayah)
     section_plan, ayah_to_file, surah_first_file = plan_surah_sections(structured, target.split_threshold)
@@ -779,6 +926,7 @@ def create_epub(structured, target):
                     target,
                     ruku_ends,
                     single_ruku_surahs,
+                    tafsir
                 ),
             )
             chapter.direction = "rtl"
@@ -786,6 +934,23 @@ def create_epub(structured, target):
             book.add_item(chapter)
             spine.append(chapter)
             toc.append(chapter)
+
+    if target.show_tafsir:
+        for surah in sorted(structured.keys()):
+            surah_name = SURAH_NAMES.get(surah, str(surah))
+            tafsir_html = build_tafsir_section_html(surah, list(structured[surah].keys()), target, tafsir, ayah_to_file)
+            if tafsir_html:
+                t_chapter = epub.EpubHtml(
+                    title=f"Tafsir - {surah_name}",
+                    file_name=f"tafsir_surah_{surah}.xhtml",
+                    lang="en",
+                    content=tafsir_html
+                )
+                t_chapter.direction = "ltr"
+                t_chapter.add_item(style)
+                book.add_item(t_chapter)
+                spine.append(t_chapter)
+                toc.append(t_chapter)
 
     book.toc = toc
     book.spine = spine
@@ -824,12 +989,12 @@ def main():
     args = parser.parse_args()
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    structured = load_data()
+    structured, tafsir = load_data()
     targets = parse_targets(args.targets)
 
     built_files = []
     for target in targets:
-        out = create_epub(structured, target)
+        out = create_epub(structured, tafsir, target)
         built_files.append(out)
         print(f"Built {target.key}: {out}")
 

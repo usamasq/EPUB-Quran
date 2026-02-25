@@ -91,32 +91,6 @@ jobs:
       - name: Generate checksums
         run: sha256sum releases/*.epub > releases/SHA256SUMS.txt
 
-      - name: Remove legacy asset from release tag
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const tag = "${{ steps.resolve_tag.outputs.tag }}";
-            try {
-              const rel = await github.rest.repos.getReleaseByTag({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag
-              });
-              const legacy = (rel.data.assets || []).find(a => a.name === "Holy_Quran.epub");
-              if (legacy) {
-                await github.rest.repos.deleteReleaseAsset({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  asset_id: legacy.id
-                });
-                core.info(`Deleted legacy asset Holy_Quran.epub from tag ${tag}`);
-              } else {
-                core.info(`No legacy asset found on tag ${tag}`);
-              }
-            } catch (e) {
-              core.info(`Release not found yet for tag ${tag}, continuing.`);
-            }
-
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2

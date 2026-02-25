@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EPUB Quran | Download Quran EPUB Editions</title>
-  <meta name="description" content="Download Quran EPUB editions (Full, Full Compat, Lite, Lite Compat) optimized for Kindle and Android readers.">
-  <meta name="keywords" content="Quran EPUB, Kindle Quran, Indo-Pak Quran, EPUB download, Quran reader">
+  <title>Download EPUB Quran | Optimized for Kindle & Android</title>
+  <meta name="description"
+    content="Download the single-file EPUB Quran featuring linked Tafsir explanations and native dark mode. Optimized for Kindle, Apple Books, and Android readers.">
+  <meta name="keywords"
+    content="Quran EPUB, Kindle Quran, Apple Books Quran, EPUB download, Quran reader, Arabic Quran, Kobo Quran">
   <meta name="author" content="Usama Bin Shahid">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#faf9f6" id="themeColorMeta">
@@ -17,24 +20,28 @@
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://usamasq.github.io/EPUB-Quran/">
-  <meta property="og:title" content="EPUB Quran Editions">
-  <meta property="og:description" content="Clean multi-edition Quran EPUB downloads with Full/Lite and compatibility variants.">
+  <meta property="og:title" content="Download EPUB Quran | Optimized for Kindle & Android">
+  <meta property="og:description"
+    content="Download the single-file EPUB Quran featuring linked Tafsir explanations and native dark mode. Optimized for Kindle, Apple Books, and Android readers.">
   <meta property="og:site_name" content="EPUB Quran">
   <meta property="og:locale" content="en_US">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="EPUB Quran Editions">
-  <meta name="twitter:description" content="Download Quran EPUB editions for Kindle and Android readers.">
+  <meta name="twitter:title" content="Download EPUB Quran | Optimized for Kindle & Android">
+  <meta name="twitter:description"
+    content="Download the single-file EPUB Quran featuring linked Tafsir explanations and native dark mode. Optimized for Kindle, Apple Books, and Android readers.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@500;700&display=swap"
+    rel="stylesheet">
 
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "EPUB Quran Editions",
+      "name": "EPUB Quran",
       "applicationCategory": "ReferenceApplication",
       "operatingSystem": "Kindle, Android, EPUB Readers",
       "url": "https://usamasq.github.io/EPUB-Quran/",
@@ -42,7 +49,7 @@
       "author": {
         "@type": "Person",
         "name": "Usama Bin Shahid",
-        "url": "https://www.linkedin.com/in/usamasq/"
+        "email": "usamasq@gmail.com"
       },
       "publisher": {
         "@type": "Person",
@@ -66,7 +73,7 @@
       --accent-hover: #0e3d28;
       --accent-soft: #e8f5ee;
       --border: #e5e5e5;
-      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
       --radius: 12px;
     }
 
@@ -79,12 +86,18 @@
       --accent-hover: #5bd88e;
       --accent-soft: #1e3a2b;
       --border: #333838;
-      --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -176,11 +189,21 @@
     }
 
     .theme-btn .icon-sun,
-    .theme-btn .icon-moon { display: none; }
+    .theme-btn .icon-moon {
+      display: none;
+    }
 
-    [data-theme="dark"] .theme-btn .icon-moon { display: inline; }
-    :root .theme-btn .icon-sun { display: inline; }
-    [data-theme="dark"] .theme-btn .icon-sun { display: none; }
+    [data-theme="dark"] .theme-btn .icon-moon {
+      display: inline;
+    }
+
+    :root .theme-btn .icon-sun {
+      display: inline;
+    }
+
+    [data-theme="dark"] .theme-btn .icon-sun {
+      display: none;
+    }
 
     /* ---- Hero ---- */
     .hero {
@@ -371,9 +394,13 @@
 
     /* ---- Responsive ---- */
     @media (max-width: 600px) {
-      .hero { padding: 32px 0 28px; }
+      .hero {
+        padding: 32px 0 28px;
+      }
 
-      .profile-group { gap: 6px; }
+      .profile-group {
+        gap: 6px;
+      }
 
       .profile-btn {
         padding: 7px 12px;
@@ -385,13 +412,15 @@
         align-items: stretch;
       }
 
-      .btn-download, .btn-secondary {
+      .btn-download,
+      .btn-secondary {
         justify-content: center;
         width: 100%;
       }
     }
   </style>
 </head>
+
 <body data-lang="en">
   <header>
     <div class="container">
@@ -415,28 +444,25 @@
     <div class="container">
       <section class="hero">
         <div class="calligraphy" data-i18n="calligraphy">القرآن الكريم</div>
-        <h1 data-i18n="heroTitle">Download Quran EPUB Editions</h1>
-        <p class="hero-sub" data-i18n="heroSub">Choose your reading device and download the right Quran EPUB in one step.</p>
+        <h1 data-i18n="heroTitle">Download Quran EPUB</h1>
+        <p class="hero-sub" data-i18n="heroSub">Choose your reading device and download the right Quran EPUB in one
+          step.</p>
       </section>
 
       <section class="download-section">
-        <div class="section-label" data-i18n="sectionDevice">Your reading device</div>
-        <div class="profile-group" id="profileGroup">
-          <button class="profile-btn active" type="button" data-profile="kindle_modern" data-i18n="profileKindleModern">Kindle (Modern)</button>
-          <button class="profile-btn" type="button" data-profile="kindle_old" data-i18n="profileKindleOld">Kindle (Older)</button>
-          <button class="profile-btn" type="button" data-profile="android" data-i18n="profileAndroid">Android</button>
-          <button class="profile-btn" type="button" data-profile="strict" data-i18n="profileStrict">Other / Compatibility</button>
-        </div>
-
         <div class="recommend-card">
           <div class="recommend-label" data-i18n="recommendedForYou">Recommended for you</div>
-          <h3 id="recommendedFile">Holy_Quran_full.epub</h3>
-          <p id="recommendedReason" class="recommend-reason">Best balance for modern Kindle firmware and stable EPUB engines.</p>
+          <h3 id="recommendedFile">Holy Quran.epub</h3>
+          <p id="recommendedReason" class="recommend-reason">Best balance for modern Kindle firmware and stable EPUB
+            engines.</p>
           <div class="download-row">
-            <a id="recommendedLink" class="btn-download" href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub" target="_blank" rel="noopener">
+            <a id="recommendedLink" class="btn-download"
+              href="https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy%20Quran.epub" target="_blank"
+              rel="noopener">
               <span data-i18n="downloadNow">Download</span>
             </a>
-            <a class="btn-secondary" href="https://github.com/usamasq/EPUB-Quran/releases" target="_blank" rel="noopener" data-i18n="allReleases">All Releases</a>
+            <a class="btn-secondary" href="https://github.com/usamasq/EPUB-Quran/releases" target="_blank"
+              rel="noopener" data-i18n="allReleases">All Releases</a>
           </div>
         </div>
       </section>
@@ -452,93 +478,41 @@
   </footer>
 
   <script>
+
     const langEn = document.getElementById("langEn");
     const langAr = document.getElementById("langAr");
     const themeToggle = document.getElementById("themeToggle");
-    const profileButtons = Array.from(document.querySelectorAll(".profile-btn"));
     const recommendedFile = document.getElementById("recommendedFile");
     const recommendedReason = document.getElementById("recommendedReason");
     const recommendedLink = document.getElementById("recommendedLink");
 
-    const variants = {
-      full: {
-        file: "Holy_Quran_full.epub",
-        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full.epub"
-      },
-      full_compat: {
-        file: "Holy_Quran_full_compat.epub",
-        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_full_compat.epub"
-      },
-      lite: {
-        file: "Holy_Quran_lite.epub",
-        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite.epub"
-      },
-      lite_compat: {
-        file: "Holy_Quran_lite_compat.epub",
-        url: "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy_Quran_lite_compat.epub"
-      }
-    };
-
-    const profiles = {
-      kindle_modern: { variant: "full", reasonKey: "reasonKindleModern" },
-      kindle_old: { variant: "full_compat", reasonKey: "reasonKindleOld" },
-      android: { variant: "lite", reasonKey: "reasonAndroid" },
-      strict: { variant: "lite_compat", reasonKey: "reasonStrict" }
-    };
-
-    let currentProfile = "kindle_modern";
     let currentLang = "en";
 
     const i18n = {
       en: {
         calligraphy: "القرآن الكريم",
-        heroTitle: "Download Quran EPUB Editions",
-        heroSub: "Choose your reading device and download the right Quran EPUB in one step.",
-        sectionDevice: "Your reading device",
-        profileKindleModern: "Kindle (Modern)",
-        profileKindleOld: "Kindle (Older)",
-        profileAndroid: "Android",
-        profileStrict: "Other / Compatibility",
-        recommendedForYou: "Recommended for you",
+        heroTitle: "Download Quran EPUB",
+        heroSub: "Download the complete Quran EPUB featuring linked Tafsir and native dark mode.",
+        recommendedForYou: "Download the EPUB",
         downloadNow: "Download",
         allReleases: "All Releases",
-        reasonKindleModern: "Enhanced typography, optimized for modern Kindle firmware.",
-        reasonKindleOld: "Compatibility styling with split long surahs for older Kindle devices.",
-        reasonAndroid: "Lighter rendering with chunking for smooth scrolling on Android readers.",
-        reasonStrict: "Most conservative profile for maximum compatibility across all readers.",
+        recommendedReason: "Universal Edition formulated with an authentic Mushaf layout, block justification, large fonts, and smooth reading across all kinds of devices.",
         footerCredit: "Compiled by Usama Bin Shahid"
       },
       ar: {
         calligraphy: "القرآن الكريم",
-        heroTitle: "تحميل نسخ القرآن بصيغة EPUB",
-        heroSub: "اختر جهاز القراءة الخاص بك وحمّل النسخة المناسبة مباشرة.",
-        sectionDevice: "جهاز القراءة الخاص بك",
-        profileKindleModern: "Kindle (حديث)",
-        profileKindleOld: "Kindle (قديم)",
-        profileAndroid: "أندرويد",
-        profileStrict: "أخرى / توافق",
-        recommendedForYou: "الموصى به لك",
+        heroTitle: "تحميل نسخة القرآن بصيغة EPUB",
+        heroSub: "حمّل نسخة القرآن الشاملة مع تفسير مدمج، ودعم الوضع الليلي، محسّنة لجميع أجهزة القراءة.",
+        recommendedForYou: "تحميل النسخة",
         downloadNow: "تنزيل",
         allReleases: "جميع الإصدارات",
-        reasonKindleModern: "تنسيق محسّن لأجهزة Kindle الحديثة.",
-        reasonKindleOld: "تنسيق توافق مع تقسيم السور الطويلة لأجهزة Kindle القديمة.",
-        reasonAndroid: "نسخة أخف مع تقسيم السور لتدفق أسرع على قارئات أندرويد.",
-        reasonStrict: "الخيار الأكثر توافقًا مع جميع برامج القراءة.",
+        recommendedReason: "نسخة شاملة مصممة لمنع التوقف وتوفير قراءة سلسة على جميع الأجهزة.",
         footerCredit: "إعداد وتجميع: أسامة بن شهيد"
       }
     };
 
     function t(key) {
       return i18n[currentLang][key] || i18n.en[key] || key;
-    }
-
-    function updateRecommendation() {
-      const profile = profiles[currentProfile];
-      const variant = variants[profile.variant];
-      profileButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.profile === currentProfile));
-      recommendedFile.textContent = variant.file;
-      recommendedReason.textContent = t(profile.reasonKey);
-      recommendedLink.href = variant.url;
     }
 
     function applyTranslations() {
@@ -552,8 +526,12 @@
       });
       langEn.setAttribute("aria-pressed", currentLang === "en" ? "true" : "false");
       langAr.setAttribute("aria-pressed", currentLang === "ar" ? "true" : "false");
-      updateRecommendation();
+
+      recommendedFile.textContent = "Holy Quran.epub";
+      recommendedLink.href = "https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy%20Quran.epub";
+      recommendedReason.textContent = t("recommendedReason");
     }
+
 
     // Theme
     function setTheme(theme) {
@@ -579,15 +557,9 @@
     langEn.addEventListener("click", () => { currentLang = "en"; applyTranslations(); });
     langAr.addEventListener("click", () => { currentLang = "ar"; applyTranslations(); });
 
-    profileButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        currentProfile = btn.dataset.profile;
-        updateRecommendation();
-      });
-    });
-
     initTheme();
     applyTranslations();
   </script>
 </body>
+
 </html>
