@@ -60,7 +60,7 @@ BUILD_TARGETS = {
         output_name="Holy Quran.epub",
         profile="compat",
         variant="lite",
-        split_threshold=70,
+        split_threshold=100,
         show_tafsir=True,
     ),
 }

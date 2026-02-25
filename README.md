@@ -10,7 +10,7 @@ Compiled and maintained by **Usama Bin Shahid** ([usamasq@gmail.com](mailto:usam
 - **Complete Built-in Tafsir**: This EPUB includes **all 114 chapters of English Tafsir** directly inside the book. Every single Arabic Ayah marker serves as a direct, clickable hyperlink jumping straight to its contextual explanation, with a back-link to return exactly to where you were reading.
 - **Authentic Mushaf Layout**: Features full block justification, tighter line-height parity, beautifully ornate Surah headers, and Ornate Parentheses for Ayah markers, replicating a traditional physical page.
 - **Native Dark Mode**: Fully supports E-Reader dark modes (`@media prefers-color-scheme: dark`) with inverted colors and preserved contrast.
-- **Crash-Free E-Reader Compatibility**: Long Surahs are intelligently split into smaller 70-Ayah chapters to prevent out-of-memory crashes on Kindle and older e-readers.
+- **Crash-Free E-Reader Compatibility**: Long Surahs are intelligently split into smaller 100-Ayah chapters to prevent out-of-memory crashes on Kindle and older e-readers.
 - **Universal Support**: One standard `.epub` file provides comprehensive compatibility across Apple Books, Android readers, and Kindle.
 - **Responsive Arabic Text**: Relies on native reader fonts to ensure smooth rendering and rapid page-turns without embedding bloated typography files.
 
