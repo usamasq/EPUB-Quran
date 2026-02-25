@@ -28,7 +28,7 @@ text = re.sub(
 # Also clean up the Each tagged release includes part that the powershell script missed
 text = re.sub(
     r'Each tagged release includes:\n\n- `Holy_Quran_full\.epub`\n- `Holy_Quran_full_compat\.epub`\n- `Holy_Quran_lite\.epub`\n- `Holy_Quran_lite_compat\.epub`\n- `SHA256SUMS\.txt`',
-    'Each tagged release includes:\n\n- `Holy_Quran.epub`\n- `SHA256SUMS.txt`',
+    'Each tagged release includes:\n\n- `Holy-Quran.epub`\n- `SHA256SUMS.txt`',
     text, flags=re.DOTALL
 )
 

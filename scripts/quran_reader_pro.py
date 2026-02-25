@@ -57,7 +57,7 @@ BUILD_TARGETS = {
     "main": BuildTarget(
         key="main",
         label="Universal Edition",
-        output_name="Holy Quran.epub",
+        output_name="Holy-Quran.epub",
         profile="compat",
         variant="lite",
         split_threshold=100,
@@ -354,6 +354,7 @@ h1.surah-header {{
     font-size: 0.9em;
     color: {accent};
     font-weight: normal;
+    text-decoration: none;
 }}
 
 .ayah-anchor {{
@@ -361,8 +362,7 @@ h1.surah-header {{
 }}
 
 .quran-text {{
-    text-align: justify;
-    text-justify: inter-word;
+    text-align: right;
     line-height: {quran_line_height};
     font-size: {quran_font_size};
     word-spacing: 0em;
@@ -581,10 +581,10 @@ h1.surah-header {{
 
 /* Tafsir Link styling */
 .tafsir-ayah-link {{
-    text-decoration: none;
-    color: inherit;
+    text-decoration: none !important;
+    border: none !important;
     font-weight: bold;
-    color: {accent};
+    color: {accent} !important;
 }}
 
 /* Tafsir Appendix styling */
@@ -713,22 +713,23 @@ def build_surah_section_html(surah_num, ayahs, section, target, ruku_ends, singl
 
         # Using Ornate Parentheses ﴿ ﴾ instead of the ARABIC_END_MARK ۝ 
         # because Kindle's default fonts lack the ligature tables to wrap the circle around Eastern Arabic digits.
-        ayah_mark = f"&#xFD3F;{to_arabic_number(ayah_num)}&#xFD3E;"
+        ayah_number_arabic = to_arabic_number(ayah_num)
         has_sajdah_symbol = False
 
         html += f'<span class="ayah-anchor" id="a{surah_num}_{ayah_num}">\u200b</span>'
 
-        ayah_link_start = ""
-        ayah_link_end = ""
         if target.show_tafsir and tafsir and (surah_num, ayah_num) in tafsir:
-            ayah_link_start = f'<a href="tafsir_surah_{surah_num}.xhtml#t{surah_num}_{ayah_num}" class="tafsir-ayah-link" epub:type="noteref" title="Explanation">'
-            ayah_link_end = '</a>'
+            linked_number = f'<a href="tafsir_surah_{surah_num}.xhtml#t{surah_num}_{ayah_num}" class="tafsir-ayah-link" epub:type="noteref" title="Explanation">{ayah_number_arabic}</a>'
+        else:
+            linked_number = ayah_number_arabic
+            
+        ayah_mark = f"&#xFD3F;{linked_number}&#xFD3E;"
 
         text = normalize_ayah_text(" ".join(ayahs[ayah_num]))
         text, has_sajdah_symbol = stylize_special_symbols(text, target)
         html += text
             
-        html += f' <span class="ayah-end">{ayah_link_start}{ayah_mark}{ayah_link_end}</span>'
+        html += f' <span class="ayah-end">{ayah_mark}</span>'
 
         if (
             target.show_ruku

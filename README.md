@@ -22,7 +22,7 @@ This text has been carefully compiled from open-source databases. However, becau
 - **Static download page:** [https://usamasq.github.io/EPUB-Quran/](https://usamasq.github.io/EPUB-Quran/)
 - **Tagged releases:** [https://github.com/usamasq/EPUB-Quran/releases](https://github.com/usamasq/EPUB-Quran/releases)
 - **Latest direct downloads (one-click):**
-  - [Holy Quran.epub](https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy%20Quran.epub)
+  - [Holy-Quran.epub](https://github.com/usamasq/EPUB-Quran/releases/latest/download/Holy-Quran.epub)
   - [SHA256SUMS.txt](https://github.com/usamasq/EPUB-Quran/releases/latest/download/SHA256SUMS.txt)
 
 If someone lands on the repository homepage first, this section is the direct path to the static site and the downloadable EPUB.
@@ -36,7 +36,7 @@ All downloadable files are published per tag in GitHub Releases:
 
 Each tagged release includes:
 
-- `Holy Quran.epub`
+- `Holy-Quran.epub`
 - `SHA256SUMS.txt`
 
 If an older tag is missing the correct file, run the **Release EPUB** workflow manually from GitHub Actions with the existing exact `tag_name` (for example `v1.1.0`, not `v1.1*`) to refresh assets for that tag.
